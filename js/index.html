@@ -3,463 +3,275 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KRONOS SYSTEM - Gestão Financeira</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
+    <title>KRONOS SYSTEM | Gestão Financeira</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Loading -->
-    <div class="loading-screen" id="loadingScreen">
-        <div class="loading-content">
-            <div class="loading-logo">
-                <i class="fas fa-chart-line"></i>
-            </div>
-            <h2>KRONOS SYSTEM</h2>
-            <p>Carregando Dashboard Executivo...</p>
-            <div class="loading-bar">
-                <div class="loading-progress"></div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Container Principal -->
-    <div class="app-wrapper">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-logo">
-                    <i class="fas fa-crown"></i>
-                    <div>
-                        <h3>KRONOS</h3>
-                        <span>SYSTEM</span>
-                    </div>
-                </div>
+    <!-- TELA DE LOGIN -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <div class="login-logo">
+                <i class="fas fa-crown"></i>
+                <h1>KRONOS SYSTEM</h1>
+                <p>GESTÃO FINANCEIRA</p>
             </div>
-            
-            <nav class="sidebar-nav">
-                <a href="#" class="nav-item active" data-page="dashboard">
-                    <i class="fas fa-th-large"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="#" class="nav-item" data-page="clientes">
-                    <i class="fas fa-users"></i>
-                    <span>Clientes</span>
-                </a>
-                <a href="#" class="nav-item" data-page="parcelas">
-                    <i class="fas fa-file-invoice"></i>
-                    <span>Parcelas</span>
-                </a>
-                <a href="#" class="nav-item" data-page="relatorios">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Relatórios</span>
-                </a>
-                <a href="#" class="nav-item" data-page="comparativo">
-                    <i class="fas fa-balance-scale"></i>
-                    <span>Comparativo</span>
-                </a>
-            </nav>
-            
-            <div class="sidebar-footer">
-                <div class="user-info">
-                    <i class="fas fa-user-circle"></i>
-                    <div>
-                        <strong>Admin</strong>
-                        <small>Gerente Financeiro</small>
-                    </div>
+            <div class="login-form">
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="loginUser" placeholder="Usuário" value="admin">
                 </div>
-            </div>
-        </aside>
-
-        <!-- Conteúdo Principal -->
-        <main class="main-content">
-            <!-- Top Bar -->
-            <header class="top-bar">
-                <button class="menu-toggle" onclick="toggleSidebar()">
-                    <i class="fas fa-bars"></i>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="loginPass" placeholder="Senha" value="admin">
+                </div>
+                <button class="btn-login" onclick="fazerLogin()">
+                    <i class="fas fa-sign-in-alt"></i> ENTRAR NO SISTEMA
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SISTEMA PRINCIPAL -->
+    <div class="main-system" id="mainSystem" style="display:none;">
+        
+        <!-- HEADER -->
+        <header class="top-header">
+            <div class="brand">
+                <i class="fas fa-chart-line"></i>
+                <div>
+                    <h1>KRONOS SYSTEM</h1>
+                    <span>Gestão Financeira</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <span id="dataAtual"></span>
+                <button onclick="sair()" class="btn-sair">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </button>
+            </div>
+        </header>
+
+        <!-- NAVEGAÇÃO -->
+        <nav class="nav-tabs">
+            <button class="tab-btn active" onclick="mostrarPagina('dashboard')">
+                <i class="fas fa-chart-pie"></i> Dashboard
+            </button>
+            <button class="tab-btn" onclick="mostrarPagina('clientes')">
+                <i class="fas fa-users"></i> Clientes
+            </button>
+            <button class="tab-btn" onclick="mostrarPagina('relatorios')">
+                <i class="fas fa-file-alt"></i> Relatórios
+            </button>
+        </nav>
+
+        <!-- PÁGINA DASHBOARD -->
+        <div class="page-content" id="pagina-dashboard">
+            
+            <!-- CARDS DE RESUMO -->
+            <div class="cards-grid">
+                <div class="resume-card">
+                    <div class="card-icon" style="background:#27ae60;">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="card-text">
+                        <h3 id="cardPago">0</h3>
+                        <p>PAGO</p>
+                    </div>
+                </div>
+                <div class="resume-card">
+                    <div class="card-icon" style="background:#c9a84c;">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="card-text">
+                        <h3 id="cardQuitado">0</h3>
+                        <p>QUITADO</p>
+                    </div>
+                </div>
+                <div class="resume-card">
+                    <div class="card-icon" style="background:#f39c12;">
+                        <i class="fas fa-spinner"></i>
+                    </div>
+                    <div class="card-text">
+                        <h3 id="cardFinalizando">0</h3>
+                        <p>FINALIZANDO</p>
+                    </div>
+                </div>
+                <div class="resume-card">
+                    <div class="card-icon" style="background:#e74c3c;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="card-text">
+                        <h3 id="cardInadimplente">0</h3>
+                        <p>INADIMPLENTE</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GRÁFICOS -->
+            <div class="charts-row">
+                <div class="chart-box">
+                    <h3><i class="fas fa-chart-bar"></i> Pagamentos por Mês</h3>
+                    <canvas id="graficoMensal" height="300"></canvas>
+                </div>
+                <div class="chart-box">
+                    <h3><i class="fas fa-chart-pie"></i> Status das Parcelas</h3>
+                    <canvas id="graficoStatus" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- COMPARATIVO DIA 5 vs DIA 20 -->
+            <div class="chart-box full-width">
+                <h3><i class="fas fa-balance-scale"></i> Comparativo: Dia 5 vs Dia 20</h3>
+                <canvas id="graficoDias" height="250"></canvas>
+            </div>
+        </div>
+
+        <!-- PÁGINA CLIENTES -->
+        <div class="page-content" id="pagina-clientes" style="display:none;">
+            
+            <!-- FILTROS -->
+            <div class="filtros-bar">
+                <select id="filtroMes" onchange="carregarClientes()">
+                    <option value="">Todos os Meses</option>
+                </select>
+                <select id="filtroDia" onchange="carregarClientes()">
+                    <option value="">Todos os Dias</option>
+                    <option value="5">Dia 5</option>
+                    <option value="20">Dia 20</option>
+                </select>
+                <select id="filtroStatus" onchange="carregarClientes()">
+                    <option value="">Todos os Status</option>
+                    <option value="pago">PAGO</option>
+                    <option value="quitado">QUITADO</option>
+                    <option value="finalizando">FINALIZANDO</option>
+                    <option value="inadimplente">INADIMPLENTE</option>
+                </select>
+                <button class="btn-add" onclick="abrirModalCliente()">
+                    <i class="fas fa-plus"></i> NOVO CLIENTE
+                </button>
+            </div>
+
+            <!-- TABELA -->
+            <div class="tabela-wrapper">
+                <table class="tabela-executiva">
+                    <thead>
+                        <tr>
+                            <th>CLIENTE</th>
+                            <th>MARCA</th>
+                            <th>VENCIMENTO</th>
+                            <th>VALOR TOTAL</th>
+                            <th>EM ABERTO</th>
+                            <th>PARCELAS</th>
+                            <th>STATUS</th>
+                            <th>AÇÕES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpoTabela">
+                        <tr><td colspan="8" style="text-align:center;">Nenhum cliente cadastrado</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PÁGINA RELATÓRIOS -->
+        <div class="page-content" id="pagina-relatorios" style="display:none;">
+            <div class="relatorio-grid">
+                <div class="relatorio-card">
+                    <h3>RESUMO GERAL</h3>
+                    <div class="relatorio-item"><span>Total Clientes:</span> <strong id="relClientes">0</strong></div>
+                    <div class="relatorio-item"><span>Total Recebido:</span> <strong id="relRecebido">R$ 0,00</strong></div>
+                    <div class="relatorio-item"><span>Em Aberto:</span> <strong id="relAberto">R$ 0,00</strong></div>
+                    <div class="relatorio-item"><span>Inadimplência:</span> <strong id="relInadimplencia">0%</strong></div>
+                </div>
+                <div class="relatorio-card">
+                    <h3>DIA 5</h3>
+                    <div class="relatorio-item"><span>Clientes:</span> <strong id="relDia5Clientes">0</strong></div>
+                    <div class="relatorio-item"><span>Recebido:</span> <strong id="relDia5Recebido">R$ 0,00</strong></div>
+                </div>
+                <div class="relatorio-card">
+                    <h3>DIA 20</h3>
+                    <div class="relatorio-item"><span>Clientes:</span> <strong id="relDia20Clientes">0</strong></div>
+                    <div class="relatorio-item"><span>Recebido:</span> <strong id="relDia20Recebido">R$ 0,00</strong></div>
+                </div>
+            </div>
+            <button class="btn-add" onclick="window.print()" style="margin-top:20px;">
+                <i class="fas fa-print"></i> IMPRIMIR RELATÓRIO
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL CLIENTE -->
+    <div class="modal-overlay" id="modalCliente" style="display:none;">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2 id="modalTitulo">NOVO CLIENTE</h2>
+                <button onclick="fecharModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editId">
+                <label>NOME DO CLIENTE</label>
+                <input type="text" id="nome" class="input-full" placeholder="Nome completo">
                 
-                <div class="top-bar-info">
-                    <div class="date-display">
-                        <i class="far fa-calendar-alt"></i>
-                        <span id="currentDate"></span>
+                <label>MARCA</label>
+                <input type="text" id="marca" class="input-full" placeholder="Nome da marca">
+                
+                <div class="input-row">
+                    <div>
+                        <label>VALOR TOTAL (R$)</label>
+                        <input type="number" id="valorTotal" class="input-full" step="0.01" onkeyup="calcParcela()">
                     </div>
-                    
-                    <div class="quick-stats">
-                        <div class="quick-stat">
-                            <small>Total Clientes</small>
-                            <strong id="quickTotalClientes">0</strong>
-                        </div>
-                        <div class="quick-stat">
-                            <small>Total Recebido</small>
-                            <strong id="quickTotalRecebido">R$ 0</strong>
-                        </div>
-                        <div class="quick-stat">
-                            <small>Em Aberto</small>
-                            <strong id="quickTotalAberto">R$ 0</strong>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Páginas -->
-            <div class="page-content">
-                <!-- ============================================ -->
-                <!-- DASHBOARD -->
-                <!-- ============================================ -->
-                <div class="page active" id="page-dashboard">
-                    <div class="page-header">
-                        <h1><i class="fas fa-tachometer-alt"></i> Dashboard Executivo</h1>
-                        <div class="period-selector">
-                            <select id="dashboardAno" class="custom-select-mini" onchange="atualizarDashboard()">
-                                <option value="2024">2024</option>
-                                <option value="2025">2025</option>
-                                <option value="2026">2026</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Cards KPIs -->
-                    <div class="kpi-grid">
-                        <div class="kpi-card">
-                            <div class="kpi-icon" style="background: rgba(46,204,113,0.1);">
-                                <i class="fas fa-check-circle" style="color: #2ecc71;"></i>
-                            </div>
-                            <div class="kpi-info">
-                                <h3 id="kpiTotalClientes">0</h3>
-                                <p>Total de Clientes</p>
-                            </div>
-                            <div class="kpi-trend up">
-                                <i class="fas fa-arrow-up"></i> 12%
-                            </div>
-                        </div>
-
-                        <div class="kpi-card">
-                            <div class="kpi-icon" style="background: rgba(52,152,219,0.1);">
-                                <i class="fas fa-dollar-sign" style="color: #3498db;"></i>
-                            </div>
-                            <div class="kpi-info">
-                                <h3 id="kpiTotalRecebido">R$ 0</h3>
-                                <p>Total Recebido</p>
-                            </div>
-                            <div class="kpi-trend up">
-                                <i class="fas fa-arrow-up"></i> 8%
-                            </div>
-                        </div>
-
-                        <div class="kpi-card">
-                            <div class="kpi-icon" style="background: rgba(243,156,18,0.1);">
-                                <i class="fas fa-clock" style="color: #f39c12;"></i>
-                            </div>
-                            <div class="kpi-info">
-                                <h3 id="kpiEmAberto">R$ 0</h3>
-                                <p>Valor em Aberto</p>
-                            </div>
-                            <div class="kpi-trend down">
-                                <i class="fas fa-arrow-down"></i> 5%
-                            </div>
-                        </div>
-
-                        <div class="kpi-card">
-                            <div class="kpi-icon" style="background: rgba(231,76,60,0.1);">
-                                <i class="fas fa-exclamation-triangle" style="color: #e74c3c;"></i>
-                            </div>
-                            <div class="kpi-info">
-                                <h3 id="kpiInadimplencia">0%</h3>
-                                <p>Taxa de Inadimplência</p>
-                            </div>
-                            <div class="kpi-trend down">
-                                <i class="fas fa-arrow-down"></i> 2%
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Gráficos -->
-                    <div class="charts-grid">
-                        <div class="chart-card large">
-                            <div class="chart-header">
-                                <h3><i class="fas fa-chart-line"></i> Fluxo de Pagamentos por Mês</h3>
-                            </div>
-                            <div class="chart-body">
-                                <canvas id="chartPagamentosMensais"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="chart-card">
-                            <div class="chart-header">
-                                <h3><i class="fas fa-chart-pie"></i> Status das Parcelas</h3>
-                            </div>
-                            <div class="chart-body">
-                                <canvas id="chartStatusParcelas"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="chart-card">
-                            <div class="chart-header">
-                                <h3><i class="fas fa-calendar-check"></i> Pagamentos por Dia</h3>
-                            </div>
-                            <div class="chart-body">
-                                <canvas id="chartPagamentosDia"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Últimos Pagamentos -->
-                    <div class="recent-activity">
-                        <div class="activity-header">
-                            <h3><i class="fas fa-history"></i> Últimos Pagamentos</h3>
-                        </div>
-                        <div class="activity-list" id="ultimosPagamentos">
-                            <!-- Preenchido via JS -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ============================================ -->
-                <!-- CLIENTES -->
-                <!-- ============================================ -->
-                <div class="page" id="page-clientes">
-                    <div class="page-header">
-                        <h1><i class="fas fa-users"></i> Clientes</h1>
-                        <button class="btn-executive" onclick="abrirModalCliente()">
-                            <i class="fas fa-plus"></i> Novo Cliente
-                        </button>
-                    </div>
-
-                    <!-- Filtros -->
-                    <div class="filters-bar">
-                        <select id="clienteMesFiltro" class="custom-select-mini" onchange="filtrarClientes()">
-                            <option value="">Todos os Meses</option>
+                    <div>
+                        <label>DIA VENCIMENTO</label>
+                        <select id="diaVencimento" class="input-full">
+                            <option value="5">DIA 5</option>
+                            <option value="20">DIA 20</option>
                         </select>
-                        <select id="clienteDiaFiltro" class="custom-select-mini" onchange="filtrarClientes()">
-                            <option value="">Todos os Dias</option>
-                            <option value="5">Dia 5</option>
-                            <option value="20">Dia 20</option>
-                        </select>
-                        <select id="clienteStatusFiltro" class="custom-select-mini" onchange="filtrarClientes()">
-                            <option value="">Todos os Status</option>
-                            <option value="pago">Pago</option>
-                            <option value="quitado">Quitado</option>
-                            <option value="finalizando">Finalizando</option>
-                            <option value="inadimplente">Inadimplente</option>
-                        </select>
-                        <input type="text" class="custom-input-mini" placeholder="Buscar cliente..." id="buscaCliente" onkeyup="filtrarClientes()">
-                    </div>
-
-                    <div class="table-container-executive">
-                        <table class="executive-table">
-                            <thead>
-                                <tr>
-                                    <th>Cliente</th>
-                                    <th>Marca</th>
-                                    <th>Vencimento</th>
-                                    <th>Valor Total</th>
-                                    <th>Em Aberto</th>
-                                    <th>Parcelas</th>
-                                    <th>Status</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabelaClientes"></tbody>
-                        </table>
                     </div>
                 </div>
-
-                <!-- ============================================ -->
-                <!-- RELATÓRIOS -->
-                <!-- ============================================ -->
-                <div class="page" id="page-relatorios">
-                    <div class="page-header">
-                        <h1><i class="fas fa-chart-bar"></i> Relatórios</h1>
-                        <button class="btn-executive" onclick="exportarRelatorio()">
-                            <i class="fas fa-download"></i> Exportar PDF
-                        </button>
+                
+                <div class="input-row">
+                    <div>
+                        <label>MÊS REFERÊNCIA</label>
+                        <input type="month" id="mesReferencia" class="input-full">
                     </div>
-
-                    <div class="report-grid">
-                        <div class="report-card">
-                            <h3>Resumo Financeiro</h3>
-                            <div class="report-stats">
-                                <div class="report-stat">
-                                    <span>Total de Clientes</span>
-                                    <strong id="relClientes">0</strong>
-                                </div>
-                                <div class="report-stat">
-                                    <span>Total Recebido</span>
-                                    <strong id="relRecebido">R$ 0</strong>
-                                </div>
-                                <div class="report-stat">
-                                    <span>Total em Aberto</span>
-                                    <strong id="relAberto">R$ 0</strong>
-                                </div>
-                                <div class="report-stat">
-                                    <span>Inadimplência</span>
-                                    <strong id="relInadimplencia">0%</strong>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="report-card">
-                            <h3>Comparativo Dia 5 vs Dia 20</h3>
-                            <div class="report-chart">
-                                <canvas id="chartComparativoDias"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="report-card large">
-                            <h3>Evolução Mensal</h3>
-                            <div class="report-chart">
-                                <canvas id="chartEvolucaoMensal"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="report-card">
-                            <h3>Top Marcas</h3>
-                            <div class="report-list" id="topMarcas"></div>
-                        </div>
+                    <div>
+                        <label>QTD PARCELAS</label>
+                        <input type="number" id="qtdParcelas" class="input-full" min="1" value="1" onkeyup="calcParcela()">
                     </div>
                 </div>
-
-                <!-- ============================================ -->
-                <!-- COMPARATIVO -->
-                <!-- ============================================ -->
-                <div class="page" id="page-comparativo">
-                    <div class="page-header">
-                        <h1><i class="fas fa-balance-scale"></i> Comparativo Mensal</h1>
-                        <div class="compare-selectors">
-                            <select id="compMes1" class="custom-select-mini" onchange="atualizarComparativo()">
-                                <option value="">Mês 1</option>
-                            </select>
-                            <span>VS</span>
-                            <select id="compMes2" class="custom-select-mini" onchange="atualizarComparativo()">
-                                <option value="">Mês 2</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="compare-grid">
-                        <div class="compare-card">
-                            <h3 id="compTitulo1">Mês 1</h3>
-                            <div class="compare-stats" id="compStats1"></div>
-                        </div>
-                        <div class="compare-card">
-                            <h3 id="compTitulo2">Mês 2</h3>
-                            <div class="compare-stats" id="compStats2"></div>
-                        </div>
-                        <div class="compare-card full-width">
-                            <h3>Gráfico Comparativo</h3>
-                            <canvas id="chartComparativo"></canvas>
-                        </div>
-                    </div>
+                
+                <div class="parcela-preview">
+                    💰 Valor de cada parcela: <strong>R$ <span id="previewParcela">0,00</span></strong>
                 </div>
             </div>
-        </main>
-    </div>
-
-    <!-- Modal Cliente -->
-    <div class="modal fade" id="modalCliente" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content executive-modal">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="fas fa-user-plus"></i>
-                        <span id="modalTitulo">NOVO CLIENTE</span>
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="formCliente">
-                        <input type="hidden" id="clienteId">
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">NOME DO CLIENTE *</label>
-                                <input type="text" class="form-control custom-input" id="nomeCliente" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">NOME DA MARCA *</label>
-                                <input type="text" class="form-control custom-input" id="marca" required>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">VALOR TOTAL (R$) *</label>
-                                <input type="number" class="form-control custom-input" id="valorTotal" step="0.01" required onkeyup="calcularParcela()">
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">DIA VENCIMENTO *</label>
-                                <select class="form-control custom-select" id="diaVencimento" required>
-                                    <option value="5">DIA 5</option>
-                                    <option value="20">DIA 20</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">MÊS REFERÊNCIA *</label>
-                                <input type="month" class="form-control custom-input" id="mesReferencia" required>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">QUANTIDADE DE PARCELAS *</label>
-                                <input type="number" class="form-control custom-input" id="qtdParcelas" min="1" value="1" required onkeyup="calcularParcela()">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">STATUS INICIAL</label>
-                                <select class="form-control custom-select" id="statusInicial">
-                                    <option value="pendente">PENDENTE</option>
-                                    <option value="pago">PAGO (Primeira Parcela)</option>
-                                    <option value="finalizando">FINALIZANDO</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="parcela-preview">
-                            <i class="fas fa-calculator"></i>
-                            <strong>Valor de cada parcela:</strong> R$ <span id="valorParcelaPreview">0,00</span>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">CANCELAR</button>
-                    <button type="button" class="btn btn-executive-modal" onclick="salvarCliente()">
-                        <i class="fas fa-save"></i> SALVAR
-                    </button>
-                </div>
+            <div class="modal-footer">
+                <button class="btn-cancelar" onclick="fecharModal()">CANCELAR</button>
+                <button class="btn-salvar" onclick="salvarCliente()">SALVAR</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Parcelas -->
-    <div class="modal fade" id="modalParcelas" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content executive-modal">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="fas fa-file-invoice"></i>
-                        GERENCIAR PARCELAS - <span id="clienteNomeParcelas"></span>
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body" id="parcelasContainer"></div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">FECHAR</button>
-                </div>
+    <!-- MODAL PARCELAS -->
+    <div class="modal-overlay" id="modalParcelas" style="display:none;">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2>GERENCIAR PARCELAS</h2>
+                <button onclick="fecharModalParcelas()">&times;</button>
             </div>
+            <div class="modal-body" id="parcelasContainer"></div>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- FIREBASE -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    <script src="js/app.js"></script>
+    
+    <!-- CHART.JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- SCRIPT PRINCIPAL -->
+    <script src="script.js"></script>
 </body>
 </html>
