@@ -6,19 +6,34 @@
     <title>KRONOS SYSTEM | Gestão Financeira</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <style>
+        .brand-logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+        }
+        .sidebar-logo-img {
+            width: 42px;
+            height: 42px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+    </style>
 </head>
 <body>
 
-    <!-- LOGIN / CRIAR CONTA -->
+    <!-- LOGIN -->
     <div class="login-container" id="loginScreen">
         <div class="login-card">
             <div class="login-brand">
-                <div class="brand-icon"><i class="fas fa-crown"></i></div>
+                <div class="brand-icon">
+                    <img src="kronos_system.jpg" alt="KRONOS SYSTEM" class="brand-logo-img" onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\'fas fa-crown\'></i>'">
+                </div>
                 <h1>KRONOS SYSTEM</h1>
                 <p>GESTÃO FINANCEIRA EXECUTIVA</p>
             </div>
             
-            <!-- FORMULÁRIO LOGIN -->
             <div id="formLogin">
                 <div class="field-group">
                     <i class="fas fa-user"></i>
@@ -37,7 +52,6 @@
                 </p>
             </div>
             
-            <!-- FORMULÁRIO CRIAR CONTA -->
             <div id="formCriarConta" style="display:none;">
                 <div class="field-group">
                     <i class="fas fa-user"></i>
@@ -73,12 +87,13 @@
     <!-- SISTEMA PRINCIPAL -->
     <div class="app-layout" id="mainSystem" style="display:none;">
         
-        <!-- SIDEBAR -->
+        <!-- SIDEBAR COM LOGO -->
         <aside class="sidebar-modern">
             <div class="sidebar-brand">
-                <i class="fas fa-chart-line"></i>
+                <img src="kronos_system.jpg" alt="KRONOS" class="sidebar-logo-img" onerror="this.style.display='none';this.insertAdjacentHTML('beforebegin','<i class=\'fas fa-chart-line\' style=\'font-size:1.6rem;color:#c9a84c;\'></i>')">
                 <div><h2>KRONOS</h2><span>SYSTEM</span></div>
             </div>
+            
             <nav class="sidebar-menu">
                 <div class="menu-section">
                     <span class="menu-label">PRINCIPAL</span>
@@ -100,6 +115,7 @@
                     <a href="#" class="menu-item" data-page="admin"><i class="fas fa-shield-alt"></i><span>Gerenciar Usuários</span></a>
                 </div>
             </nav>
+            
             <div class="sidebar-user">
                 <div class="user-avatar"><i class="fas fa-user-circle"></i></div>
                 <div class="user-info"><strong id="sidebarUserName">Admin</strong><small id="sidebarUserCargo">Gerente</small></div>
@@ -175,23 +191,14 @@
             <!-- ADMIN -->
             <div class="page-content" id="page-admin">
                 <div class="admin-grid">
-                    <div class="admin-card highlight">
-                        <div class="admin-card-header"><h3><i class="fas fa-user-circle"></i> MEU PERFIL</h3><span class="badge-status badge-pago">ADMIN</span></div>
-                        <div class="admin-card-body">
-                            <div class="profile-info"><div class="profile-avatar"><i class="fas fa-crown"></i></div><div class="profile-details" id="meuPerfil"><h4>Carregando...</h4><p>Super Administrador</p></div></div>
-                            <button class="btn-primary" onclick="editarMeuPerfil()" style="margin-top:15px;width:100%;"><i class="fas fa-edit"></i> EDITAR MEU PERFIL</button>
-                        </div>
-                    </div>
-                    <div class="admin-card">
-                        <div class="admin-card-header"><h3><i class="fas fa-users"></i> FUNCIONÁRIOS</h3><button class="btn-primary" onclick="abrirModalUsuario()"><i class="fas fa-user-plus"></i> Novo</button></div>
-                        <div class="admin-card-body" id="listaUsuarios"><p style="color:#8899aa;text-align:center;">Carregando...</p></div>
-                    </div>
+                    <div class="admin-card highlight"><div class="admin-card-header"><h3><i class="fas fa-user-circle"></i> MEU PERFIL</h3><span class="badge-status badge-pago">ADMIN</span></div><div class="admin-card-body"><div class="profile-info"><div class="profile-avatar"><img src="kronos_system.jpg" alt="KRONOS" style="width:100%;height:100%;object-fit:contain;border-radius:50%;" onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\'fas fa-crown\'></i>'"></div><div class="profile-details" id="meuPerfil"><h4>Carregando...</h4><p>Super Administrador</p></div></div><button class="btn-primary" onclick="editarMeuPerfil()" style="margin-top:15px;width:100%;"><i class="fas fa-edit"></i> EDITAR MEU PERFIL</button></div></div>
+                    <div class="admin-card"><div class="admin-card-header"><h3><i class="fas fa-users"></i> FUNCIONÁRIOS</h3><button class="btn-primary" onclick="abrirModalUsuario()"><i class="fas fa-user-plus"></i> Novo</button></div><div class="admin-card-body" id="listaUsuarios"><p style="color:#8899aa;text-align:center;">Carregando...</p></div></div>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- MODAL CLIENTE -->
+    <!-- MODALS -->
     <div class="modal-overlay" id="modalCliente" style="display:none;">
         <div class="modal-modern"><div class="modal-header"><h2 id="modalTitulo">NOVO CLIENTE</h2><button onclick="fecharModalCliente()"><i class="fas fa-times"></i></button></div>
         <div class="modal-body"><input type="hidden" id="editId">
@@ -203,14 +210,12 @@
         <div class="modal-footer"><button class="btn-cancel" onclick="fecharModalCliente()">CANCELAR</button><button class="btn-primary" onclick="salvarCliente()">SALVAR CLIENTE</button></div></div>
     </div>
 
-    <!-- MODAL PARCELA -->
     <div class="modal-overlay" id="modalParcela" style="display:none;">
         <div class="modal-modern modal-sm"><div class="modal-header"><h2>ATUALIZAR PARCELA</h2><button onclick="fecharModalParcela()"><i class="fas fa-times"></i></button></div>
         <div class="modal-body"><p id="infoParcela" style="margin-bottom:15px;"></p><div class="form-group"><label>NOVO STATUS</label><select id="novoStatus" class="form-input"><option value="pendente">PENDENTE</option><option value="pago">PAGO</option><option value="quitado">QUITADO</option><option value="finalizando">FINALIZANDO</option><option value="inadimplente">INADIMPLENTE</option></select></div><input type="hidden" id="parcelaClienteId"><input type="hidden" id="parcelaKey"></div>
         <div class="modal-footer"><button class="btn-cancel" onclick="fecharModalParcela()">CANCELAR</button><button class="btn-primary" onclick="atualizarStatusParcela()">ATUALIZAR</button></div></div>
     </div>
 
-    <!-- MODAL USUÁRIO -->
     <div class="modal-overlay" id="modalUsuario" style="display:none;">
         <div class="modal-modern"><div class="modal-header"><h2 id="modalUsuarioTitulo">NOVO USUÁRIO</h2><button onclick="fecharModalUsuario()"><i class="fas fa-times"></i></button></div>
         <div class="modal-body"><input type="hidden" id="editUserId">
