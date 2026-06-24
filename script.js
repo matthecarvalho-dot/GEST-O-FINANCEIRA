@@ -1,5 +1,6 @@
 // ============================================
-// KRONOS SYSTEM v5.0 - Dashboard Fixo
+// KRONOS SYSTEM v6.0 - Completo
+// Super Admin + Criar Perfil + Gestão Total
 // ============================================
 
 const firebaseConfig = {
@@ -15,6 +16,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const clientesRef = db.ref('kronos_system/clientes');
+const usuariosRef = db.ref('kronos_system/usuarios');
 
 let todosClientes = {};
 let charts = {};
@@ -27,45 +29,189 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(atualizarDataHora, 60000);
     carregarMeses();
     verificarBanco();
+    verificarSessaoSalva();
     inicializarMenu();
 });
 
-function atualizarDataHora() {
-    const el = document.getElementById('currentDateTime');
-    if (el) el.textContent = new Date().toLocaleDateString('pt-BR', { 
-        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' 
-    });
-}
-
 async function verificarBanco() {
     const snap = await db.ref('kronos_system').once('value');
-    if (!snap.exists()) {
-        await db.ref('kronos_system').set({
-            configuracoes: { empresa: "KRONOS SYSTEM", versao: "5.0" },
-            clientes: {
-                _ex1: { nome:"EMPRESA ALPHA LTDA", marca:"MARCA GOLD", valor_total:12000, dia_vencimento:5, mes_referencia:"2024-06", qtd_parcelas:12, valor_parcela:1000, data_cadastro:new Date().toISOString(), parcelas:{ p1:{numero:1,valor:1000,vencimento:"2024-06-05",status:"pago",data_pagamento:"2024-06-03"}, p2:{numero:2,valor:1000,vencimento:"2024-07-05",status:"quitado",data_pagamento:"2024-07-01"}, p3:{numero:3,valor:1000,vencimento:"2024-08-05",status:"finalizando",data_pagamento:null}, p4:{numero:4,valor:1000,vencimento:"2024-09-05",status:"inadimplente",data_pagamento:null} } },
-                _ex2: { nome:"COMÉRCIO BETA", marca:"MARCA PRATA", valor_total:8000, dia_vencimento:20, mes_referencia:"2024-06", qtd_parcelas:8, valor_parcela:1000, data_cadastro:new Date().toISOString(), parcelas:{ p1:{numero:1,valor:1000,vencimento:"2024-06-20",status:"pago",data_pagamento:"2024-06-18"}, p2:{numero:2,valor:1000,vencimento:"2024-07-20",status:"quitado",data_pagamento:"2024-07-15"}, p3:{numero:3,valor:1000,vencimento:"2024-08-20",status:"pendente",data_pagamento:null} } }
+    const dados = snap.val() || {};
+    
+    if (!dados.usuarios || Object.keys(dados.usuarios).length === 0) {
+        await usuariosRef.push({
+            nome: "Mattheus Carvalho",
+            usuario: "MattheCarvalho",
+            senha: "Kronos@2024",
+            cargo: "CEO & Fundador",
+            nivel: "super_admin",
+            ativo: true,
+            data_criacao: new Date().toISOString(),
+            criado_por: "sistema"
+        });
+        console.log('✅ Super Admin criado!');
+    }
+    
+    if (!dados.clientes || Object.keys(dados.clientes).length === 0) {
+        await clientesRef.set({
+            _ex1: {
+                nome:"EMPRESA ALPHA LTDA", marca:"MARCA GOLD", valor_total:12000,
+                dia_vencimento:5, mes_referencia:"2024-06", qtd_parcelas:12, valor_parcela:1000,
+                data_cadastro:new Date().toISOString(), criado_por:"sistema",
+                parcelas:{
+                    p1:{numero:1,valor:1000,vencimento:"2024-06-05",status:"pago",data_pagamento:"2024-06-03"},
+                    p2:{numero:2,valor:1000,vencimento:"2024-07-05",status:"quitado",data_pagamento:"2024-07-01"},
+                    p3:{numero:3,valor:1000,vencimento:"2024-08-05",status:"finalizando",data_pagamento:null},
+                    p4:{numero:4,valor:1000,vencimento:"2024-09-05",status:"inadimplente",data_pagamento:null}
+                }
+            },
+            _ex2: {
+                nome:"COMÉRCIO BETA", marca:"MARCA PRATA", valor_total:8000,
+                dia_vencimento:20, mes_referencia:"2024-06", qtd_parcelas:8, valor_parcela:1000,
+                data_cadastro:new Date().toISOString(), criado_por:"sistema",
+                parcelas:{
+                    p1:{numero:1,valor:1000,vencimento:"2024-06-20",status:"pago",data_pagamento:"2024-06-18"},
+                    p2:{numero:2,valor:1000,vencimento:"2024-07-20",status:"quitado",data_pagamento:"2024-07-15"},
+                    p3:{numero:3,valor:1000,vencimento:"2024-08-20",status:"pendente",data_pagamento:null}
+                }
             }
         });
+        console.log('✅ Clientes exemplo criados!');
     }
+    
     carregarClientes();
 }
 
 // ============================================
-// LOGIN
+// LOGIN / CRIAR CONTA
 // ============================================
-function fazerLogin() {
-    const user = document.getElementById('loginUser').value.trim();
-    const pass = document.getElementById('loginPass').value.trim();
-    if (user === 'admin' && pass === 'admin') {
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('mainSystem').style.display = 'flex';
-        document.getElementById('sidebarUserName').textContent = 'Administrador';
-        showPage('dashboard');
-    } else { alert('Usuário ou senha incorretos!'); }
+function mostrarCriarConta() {
+    document.getElementById('formLogin').style.display = 'none';
+    document.getElementById('formCriarConta').style.display = 'block';
+}
+
+function mostrarLogin() {
+    document.getElementById('formCriarConta').style.display = 'none';
+    document.getElementById('formLogin').style.display = 'block';
+}
+
+async function criarConta() {
+    const nome = document.getElementById('novoNome').value.trim();
+    const cargo = document.getElementById('novoCargo').value.trim();
+    const usuario = document.getElementById('novoUsuario').value.trim();
+    const senha = document.getElementById('novaSenha').value;
+    const senhaConf = document.getElementById('novaSenhaConf').value;
+    
+    if (!nome || !usuario || !senha) {
+        alert('Preencha todos os campos obrigatórios!');
+        return;
+    }
+    
+    if (senha !== senhaConf) {
+        alert('As senhas não conferem!');
+        return;
+    }
+    
+    if (senha.length < 6) {
+        alert('A senha deve ter pelo menos 6 caracteres!');
+        return;
+    }
+    
+    // Verificar se usuário já existe
+    const snap = await usuariosRef.orderByChild('usuario').equalTo(usuario).once('value');
+    if (snap.exists()) {
+        alert('❌ Este nome de usuário já está em uso!');
+        return;
+    }
+    
+    // Criar usuário
+    await usuariosRef.push({
+        nome,
+        cargo: cargo || 'Funcionário',
+        usuario,
+        senha,
+        nivel: 'funcionario',
+        ativo: true,
+        data_criacao: new Date().toISOString(),
+        criado_por: 'auto_cadastro'
+    });
+    
+    alert('✅ Perfil criado com sucesso! Faça login para continuar.');
+    mostrarLogin();
+    document.getElementById('loginUser').value = usuario;
+    document.getElementById('loginPass').value = '';
+}
+
+async function fazerLogin() {
+    const login = document.getElementById('loginUser').value.trim();
+    const senha = document.getElementById('loginPass').value.trim();
+    
+    if (!login || !senha) {
+        alert('Preencha usuário e senha!');
+        return;
+    }
+    
+    const snap = await usuariosRef.orderByChild('usuario').equalTo(login).once('value');
+    const usuarios = snap.val();
+    
+    if (!usuarios) {
+        alert('❌ Usuário não encontrado!');
+        return;
+    }
+    
+    const userId = Object.keys(usuarios)[0];
+    const userData = usuarios[userId];
+    
+    if (userData.senha !== senha) {
+        alert('❌ Senha incorreta!');
+        return;
+    }
+    
+    if (!userData.ativo) {
+        alert('❌ Usuário desativado! Contate o administrador.');
+        return;
+    }
+    
+    // LOGIN SUCESSO
+    window.usuarioLogado = {
+        id: userId,
+        nome: userData.nome,
+        usuario: userData.usuario,
+        cargo: userData.cargo || 'Funcionário',
+        nivel: userData.nivel
+    };
+    
+    localStorage.setItem('kronos_user', JSON.stringify(window.usuarioLogado));
+    await usuariosRef.child(userId).update({ ultimo_login: new Date().toISOString() });
+    
+    entrarSistema();
+}
+
+function verificarSessaoSalva() {
+    const userData = localStorage.getItem('kronos_user');
+    if (userData) {
+        window.usuarioLogado = JSON.parse(userData);
+        entrarSistema();
+    }
+}
+
+function entrarSistema() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('mainSystem').style.display = 'flex';
+    document.getElementById('sidebarUserName').textContent = window.usuarioLogado.nome.split(' ')[0];
+    document.getElementById('sidebarUserCargo').textContent = window.usuarioLogado.cargo || 'Funcionário';
+    
+    // Mostrar/esconder menu admin
+    const menuAdmin = document.querySelector('.menu-item[data-page="admin"]');
+    if (menuAdmin) {
+        menuAdmin.style.display = (window.usuarioLogado.nivel === 'super_admin' || window.usuarioLogado.nivel === 'admin') ? 'flex' : 'none';
+    }
+    
+    showPage('dashboard');
 }
 
 function sair() {
+    localStorage.removeItem('kronos_user');
+    window.usuarioLogado = null;
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('mainSystem').style.display = 'none';
 }
@@ -77,8 +223,7 @@ function inicializarMenu() {
     document.querySelectorAll('.menu-item').forEach(item => {
         item.addEventListener('click', function(e) {
             e.preventDefault();
-            const page = this.dataset.page;
-            showPage(page);
+            showPage(this.dataset.page);
         });
     });
 }
@@ -94,9 +239,9 @@ function showPage(page) {
     if (menuEl) menuEl.classList.add('active');
     
     const titles = {
-        dashboard: 'Dashboard Executivo', clientes: 'Todos os Clientes',
-        dia5: 'Clientes - Dia 5', dia20: 'Clientes - Dia 20',
-        parcelas: 'Todas as Parcelas', relatorios: 'Relatórios Gerenciais'
+        dashboard:'Dashboard Executivo', clientes:'Todos os Clientes',
+        dia5:'Vencimento Dia 5', dia20:'Vencimento Dia 20',
+        parcelas:'Todas as Parcelas', relatorios:'Relatórios', admin:'Gerenciar Usuários'
     };
     document.getElementById('pageTitle').textContent = titles[page] || '';
     
@@ -106,6 +251,7 @@ function showPage(page) {
     else if (page === 'dia20') carregarClientesDia(20);
     else if (page === 'parcelas') carregarTodasParcelas();
     else if (page === 'relatorios') carregarRelatorios();
+    else if (page === 'admin') carregarUsuarios();
 }
 
 // ============================================
@@ -117,8 +263,7 @@ function carregarClientes() {
         document.getElementById('totalClientesTop').textContent = `${Object.keys(todosClientes).length} clientes`;
         document.getElementById('badgeDia5').textContent = Object.values(todosClientes).filter(c => c.dia_vencimento == 5).length;
         document.getElementById('badgeDia20').textContent = Object.values(todosClientes).filter(c => c.dia_vencimento == 20).length;
-        atualizarDashboard();
-        carregarUltimosClientes();
+        if (document.getElementById('page-dashboard').classList.contains('active')) atualizarDashboard();
     });
 }
 
@@ -130,6 +275,11 @@ function carregarMeses() {
         const d = new Date(agora.getFullYear(), agora.getMonth() + i, 1);
         sel.innerHTML += `<option value="${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}">${d.toLocaleDateString('pt-BR',{month:'long',year:'numeric'}).toUpperCase()}</option>`;
     }
+}
+
+function atualizarDataHora() {
+    const el = document.getElementById('currentDateTime');
+    if (el) el.textContent = new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' });
 }
 
 // ============================================
@@ -144,7 +294,6 @@ function getStatus(c) {
     if (pagas > 0) return 'finalizando';
     return 'pendente';
 }
-
 function calcAberto(c) { if(!c.parcelas) return c.valor_total||0; return Object.values(c.parcelas).filter(p=>p.status!=='pago'&&p.status!=='quitado').reduce((t,p)=>t+p.valor,0); }
 function calcRecebido(c) { if(!c.parcelas) return 0; return Object.values(c.parcelas).filter(p=>p.status==='pago'||p.status==='quitado').reduce((t,p)=>t+p.valor,0); }
 function contarPagas(c) { if(!c.parcelas) return 0; return Object.values(c.parcelas).filter(p=>p.status==='pago'||p.status==='quitado').length; }
@@ -156,26 +305,24 @@ function formatData(d) { if(!d) return '-'; return new Date(d).toLocaleDateStrin
 // ============================================
 function atualizarDashboard() {
     const clientes = Object.values(todosClientes);
-    let p=0, q=0, f=0, i=0, totalRec=0, totalAb=0, totalParc=0, inad=0;
-    
+    let p=0, q=0, f=0, i=0, tr=0, ta=0, tp=0, inad=0;
     clientes.forEach(c => {
         const st = getStatus(c);
         if(st==='pago') p++; else if(st==='quitado') q++; else if(st==='finalizando') f++; else if(st==='inadimplente') i++;
-        totalRec += calcRecebido(c); totalAb += calcAberto(c);
-        if(c.parcelas) Object.values(c.parcelas).forEach(parc => { totalParc++; if(parc.status==='inadimplente') inad++; });
+        tr += calcRecebido(c); ta += calcAberto(c);
+        if(c.parcelas) Object.values(c.parcelas).forEach(pr => { tp++; if(pr.status==='inadimplente') inad++; });
     });
-    
-    document.getElementById('kpiPago').textContent = p;
-    document.getElementById('kpiQuitado').textContent = q;
-    document.getElementById('kpiFinalizando').textContent = f;
-    document.getElementById('kpiInadimplente').textContent = i;
-    document.getElementById('resumoRecebido').textContent = formatMoeda(totalRec);
-    document.getElementById('resumoAberto').textContent = formatMoeda(totalAb);
-    document.getElementById('resumoInadimplencia').textContent = totalParc>0?((inad/totalParc)*100).toFixed(1)+'%':'0%';
-    
+    document.getElementById('kpiPago').textContent=p;
+    document.getElementById('kpiQuitado').textContent=q;
+    document.getElementById('kpiFinalizando').textContent=f;
+    document.getElementById('kpiInadimplente').textContent=i;
+    document.getElementById('resumoRecebido').textContent=formatMoeda(tr);
+    document.getElementById('resumoAberto').textContent=formatMoeda(ta);
+    document.getElementById('resumoInadimplencia').textContent=tp>0?((inad/tp)*100).toFixed(1)+'%':'0%';
     criarGraficoMensal(clientes);
     criarGraficoStatus(clientes);
     criarGraficoComparativo(clientes);
+    carregarUltimosClientes();
 }
 
 function carregarUltimosClientes() {
@@ -183,12 +330,9 @@ function carregarUltimosClientes() {
     if(!tbody) return;
     const clientes = Object.entries(todosClientes).slice(-5).reverse();
     if(clientes.length===0){ tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:20px;">Nenhum cliente</td></tr>'; return; }
-    tbody.innerHTML = clientes.map(([id,c])=>`<tr><td><strong>${c.nome}</strong></td><td>${c.marca}</td><td>Dia ${c.dia_vencimento} - ${c.mes_referencia||'-'}</td><td>${formatMoeda(c.valor_total||0)}</td><td>${contarPagas(c)}/${c.qtd_parcelas||0}</td><td><span class="badge-status badge-${getStatus(c)}">${getStatus(c).toUpperCase()}</span></td></tr>`).join('');
+    tbody.innerHTML=clientes.map(([_,c])=>`<tr><td><strong>${c.nome}</strong></td><td>${c.marca}</td><td>Dia ${c.dia_vencimento}</td><td>${formatMoeda(c.valor_total||0)}</td><td>${contarPagas(c)}/${c.qtd_parcelas||0}</td><td><span class="badge-status badge-${getStatus(c)}">${getStatus(c).toUpperCase()}</span></td></tr>`).join('');
 }
 
-// ============================================
-// GRÁFICOS
-// ============================================
 function criarGraficoMensal(clientes) {
     const ctx = document.getElementById('chartMensal')?.getContext('2d');
     if(!ctx) return;
@@ -227,7 +371,7 @@ function carregarTabelaClientes() {
     let clientes=Object.entries(todosClientes);
     if(busca) clientes=clientes.filter(([_,c])=>c.nome.toLowerCase().includes(busca)||c.marca.toLowerCase().includes(busca));
     if(mes) clientes=clientes.filter(([_,c])=>c.mes_referencia===mes);
-    if(clientes.length===0){ tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:30px;">Nenhum cliente encontrado</td></tr>'; return; }
+    if(clientes.length===0){ tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:30px;">Nenhum cliente</td></tr>'; return; }
     tbody.innerHTML=clientes.map(([id,c])=>renderLinha(id,c)).join('');
 }
 
@@ -259,7 +403,7 @@ function carregarTodasParcelas() {
 function verParcelas(id) { showPage('parcelas'); setTimeout(carregarTodasParcelas,100); }
 
 // ============================================
-// MODAL PARCELA
+// PARCELAS MODAL
 // ============================================
 function abrirModalEditarParcela(clienteId, parcelaKey) {
     const c=todosClientes[clienteId]; if(!c||!c.parcelas||!c.parcelas[parcelaKey]) return;
@@ -320,7 +464,7 @@ async function salvarCliente(){
     if(!nome||!marca||!vt||!qp||!mr){ alert('Preencha todos os campos!'); return; }
     const vp=vt/qp; const parcelas={}; const [ano,mes]=mr.split('-').map(Number);
     for(let i=1;i<=qp;i++){ const venc=new Date(ano,mes-1+(i-1),dv); parcelas[`p${i}`]={numero:i,valor:vp,vencimento:venc.toISOString().split('T')[0],status:'pendente',data_pagamento:null}; }
-    const dados={nome,marca,valor_total:vt,qtd_parcelas:qp,valor_parcela:vp,dia_vencimento:dv,mes_referencia:mr,parcelas,data_atualizacao:new Date().toISOString()};
+    const dados={nome,marca,valor_total:vt,qtd_parcelas:qp,valor_parcela:vp,dia_vencimento:dv,mes_referencia:mr,parcelas,data_atualizacao:new Date().toISOString(),criado_por:window.usuarioLogado?window.usuarioLogado.usuario:'admin'};
     if(eid){ await clientesRef.child(eid).update(dados); } else { dados.data_cadastro=new Date().toISOString(); await clientesRef.push(dados); }
     fecharModalCliente();
 }
@@ -340,3 +484,133 @@ function carregarRelatorios(){
     document.getElementById('relDia5Cli').textContent=d5c; document.getElementById('relDia5Rec').textContent=formatMoeda(d5r); document.getElementById('relDia5Ab').textContent=formatMoeda(d5a);
     document.getElementById('relDia20Cli').textContent=d20c; document.getElementById('relDia20Rec').textContent=formatMoeda(d20r); document.getElementById('relDia20Ab').textContent=formatMoeda(d20a);
 }
+
+// ============================================
+// GERENCIAR USUÁRIOS
+// ============================================
+async function carregarUsuarios() {
+    const snap = await usuariosRef.once('value');
+    const usuarios = snap.val() || {};
+    
+    if (window.usuarioLogado) {
+        document.getElementById('meuPerfil').innerHTML = `
+            <h4>${window.usuarioLogado.nome}</h4>
+            <p>${window.usuarioLogado.cargo} • ${window.usuarioLogado.nivel.replace('_',' ').toUpperCase()}</p>
+            <small style="color:#8899aa;">@${window.usuarioLogado.usuario}</small>
+        `;
+    }
+    
+    const container = document.getElementById('listaUsuarios');
+    const lista = Object.entries(usuarios);
+    
+    if (lista.length === 0) {
+        container.innerHTML = '<p style="color:#8899aa;text-align:center;padding:20px;">Nenhum funcionário</p>';
+        return;
+    }
+    
+    container.innerHTML = lista.map(([id, u]) => {
+        const isMe = window.usuarioLogado && window.usuarioLogado.id === id;
+        const nivelBadge = u.nivel === 'super_admin' ? 'badge-pago' : u.nivel === 'admin' ? 'badge-quitado' : u.nivel === 'gerente' ? 'badge-finalizando' : 'badge-pendente';
+        
+        return `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #1e293b;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:40px;height:40px;border-radius:50%;background:rgba(212,168,83,0.15);display:flex;align-items:center;justify-content:center;color:#c9a84c;font-weight:700;">${u.nome.charAt(0).toUpperCase()}</div>
+                    <div>
+                        <strong style="color:#fff;">${u.nome} ${isMe ? '(Você)' : ''}</strong>
+                        <small style="color:#8899aa;display:block;">@${u.usuario} • ${u.cargo}</small>
+                        <span class="badge-status ${nivelBadge}" style="font-size:0.6rem;">${u.nivel.replace('_',' ').toUpperCase()}</span>
+                        <span class="badge-status ${u.ativo ? 'badge-pago' : 'badge-inadimplente'}" style="font-size:0.6rem;margin-left:4px;">${u.ativo ? 'ATIVO' : 'INATIVO'}</span>
+                    </div>
+                </div>
+                <div style="display:flex;gap:6px;">
+                    <button class="btn-sm edit" onclick="editarUsuario('${id}')"><i class="fas fa-edit"></i></button>
+                    ${!isMe ? `<button class="btn-sm" onclick="toggleUsuario('${id}',${!u.ativo})"><i class="fas fa-power-off"></i></button><button class="btn-sm danger" onclick="excluirUsuario('${id}')"><i class="fas fa-trash"></i></button>` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function abrirModalUsuario() {
+    document.getElementById('editUserId').value = '';
+    document.getElementById('modalUsuarioTitulo').textContent = 'NOVO USUÁRIO';
+    ['usuarioNome','usuarioCargo','usuarioLogin','usuarioSenha'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('usuarioNivel').value = 'funcionario';
+    document.getElementById('usuarioAtivo').value = 'true';
+    document.getElementById('modalUsuario').style.display = 'flex';
+}
+
+function editarUsuario(id) {
+    usuariosRef.child(id).once('value').then(snap => {
+        const u = snap.val();
+        if (!u) return;
+        document.getElementById('editUserId').value = id;
+        document.getElementById('modalUsuarioTitulo').textContent = 'EDITAR USUÁRIO';
+        document.getElementById('usuarioNome').value = u.nome;
+        document.getElementById('usuarioCargo').value = u.cargo || '';
+        document.getElementById('usuarioLogin').value = u.usuario;
+        document.getElementById('usuarioSenha').value = u.senha;
+        document.getElementById('usuarioNivel').value = u.nivel;
+        document.getElementById('usuarioAtivo').value = u.ativo ? 'true' : 'false';
+        document.getElementById('modalUsuario').style.display = 'flex';
+    });
+}
+
+function editarMeuPerfil() {
+    if (!window.usuarioLogado) return;
+    editarUsuario(window.usuarioLogado.id);
+}
+
+function fecharModalUsuario() { document.getElementById('modalUsuario').style.display = 'none'; }
+
+async function salvarUsuario() {
+    const editId = document.getElementById('editUserId').value;
+    const nome = document.getElementById('usuarioNome').value.trim();
+    const cargo = document.getElementById('usuarioCargo').value.trim();
+    const login = document.getElementById('usuarioLogin').value.trim();
+    const senha = document.getElementById('usuarioSenha').value.trim();
+    const nivel = document.getElementById('usuarioNivel').value;
+    const ativo = document.getElementById('usuarioAtivo').value === 'true';
+    
+    if (!nome || !login || !senha) { alert('Preencha os campos obrigatórios!'); return; }
+    
+    const dados = { nome, cargo, usuario: login, senha, nivel, ativo, data_atualizacao: new Date().toISOString() };
+    
+    if (editId) {
+        await usuariosRef.child(editId).update(dados);
+        if (window.usuarioLogado && window.usuarioLogado.id === editId) {
+            window.usuarioLogado.nome = nome;
+            window.usuarioLogado.cargo = cargo;
+            window.usuarioLogado.usuario = login;
+            window.usuarioLogado.nivel = nivel;
+            localStorage.setItem('kronos_user', JSON.stringify(window.usuarioLogado));
+            document.getElementById('sidebarUserName').textContent = nome.split(' ')[0];
+            document.getElementById('sidebarUserCargo').textContent = cargo;
+        }
+    } else {
+        dados.data_criacao = new Date().toISOString();
+        dados.criado_por = window.usuarioLogado ? window.usuarioLogado.usuario : 'sistema';
+        await usuariosRef.push(dados);
+    }
+    
+    fecharModalUsuario();
+    carregarUsuarios();
+    alert('✅ Usuário salvo com sucesso!');
+}
+
+async function toggleUsuario(id, ativo) {
+    await usuariosRef.child(id).update({ ativo });
+    carregarUsuarios();
+}
+
+async function excluirUsuario(id) {
+    if (!confirm('Excluir este usuário?')) return;
+    const snap = await usuariosRef.child(id).once('value');
+    const u = snap.val();
+    if (u.nivel === 'super_admin') { alert('❌ Não é possível excluir o Super Admin!'); return; }
+    await usuariosRef.child(id).remove();
+    carregarUsuarios();
+}
+
+console.log('🚀 KRONOS SYSTEM v6.0 - Pronto!');
