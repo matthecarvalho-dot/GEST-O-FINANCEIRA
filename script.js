@@ -140,4 +140,178 @@ function criarGraficoMensal(clientes) {
     const rec = new Array(12).fill(0), ab = new Array(12).fill(0);
     clientes.forEach(c => {
         if (!c.parcelas) return;
-        Object.values(c.parcelas).forEach
+        Object.values(c.parcelas).forEach(p => {
+            const m = new Date(p.vencimento).getMonth();
+            if (p.status === 'pago' || p.status === 'quitado') rec[m] += p.valor;
+            else ab[m] += p.valor;
+        });
+    });
+    graficos.mensal = new Chart(ctx, {
+        type: 'bar', data: { labels: meses, datasets: [
+            { label:'Recebido', data:rec, backgroundColor:'#27ae60', borderRadius:5 },
+            { label:'Em Aberto', data:ab, backgroundColor:'#e74c3c', borderRadius:5 }
+        ]},
+        options: { responsive:true, maintainAspectRatio:false,
+            plugins:{ legend:{ labels:{ color:'#8899aa' } } },
+            scales:{ y:{ grid:{ color:'rgba(255,255,255,0.05)' }, ticks:{ color:'#8899aa' } },
+                     x:{ grid:{ display:false }, ticks:{ color:'#8899aa' } } }
+        }
+    });
+}
+
+function criarGraficoStatus(clientes) {
+    const ctx = document.getElementById('graficoStatus').getContext('2d');
+    if (graficos.status) graficos.status.destroy();
+    let pa=0, q=0, f=0, i=0, pe=0;
+    clientes.forEach(c => {
+        if (!c.parcelas) return;
+        Object.values(c.parcelas).forEach(p => {
+            if (p.status==='pago') pa++; else if(p.status==='quitado') q++;
+            else if(p.status==='finalizando') f++; else if(p.status==='inadimplente') i++;
+            else pe++;
+        });
+    });
+    graficos.status = new Chart(ctx, {
+        type:'doughnut',
+        data:{ labels:['PAGO','QUITADO','FINALIZANDO','INADIMPLENTE','PENDENTE'],
+               datasets:[{ data:[pa,q,f,i,pe], backgroundColor:['#27ae60','#c9a84c','#f39c12','#e74c3c','#3498db'] }] },
+        options:{ responsive:true, maintainAspectRatio:false,
+                  plugins:{ legend:{ position:'bottom', labels:{ color:'#8899aa', padding:15 } } } }
+    });
+}
+
+function criarGraficoDias(clientes) {
+    const ctx = document.getElementById('graficoDias').getContext('2d');
+    if (graficos.dias) graficos.dias.destroy();
+    let d5t=0, d5p=0, d20t=0, d20p=0;
+    clientes.forEach(c => {
+        if (!c.parcelas) return;
+        Object.values(c.parcelas).forEach(p => {
+            const dia = new Date(p.vencimento).getDate();
+            if(dia===5){ d5t+=p.valor; if(p.status==='pago'||p.status==='quitado') d5p+=p.valor; }
+            else if(dia===20){ d20t+=p.valor; if(p.status==='pago'||p.status==='quitado') d20p+=p.valor; }
+        });
+    });
+    graficos.dias = new Chart(ctx, {
+        type:'bar', data:{ labels:['DIA 5','DIA 20'], datasets:[
+            { label:'Total', data:[d5t,d20t], backgroundColor:'#3498db', borderRadius:5 },
+            { label:'Recebido', data:[d5p,d20p], backgroundColor:'#27ae60', borderRadius:5 }
+        ]},
+        options:{ responsive:true, maintainAspectRatio:false,
+                  plugins:{ legend:{ labels:{ color:'#8899aa' } } },
+                  scales:{ y:{ grid:{ color:'rgba(255,255,255,0.05)' }, ticks:{ color:'#8899aa' } },
+                           x:{ grid:{ display:false }, ticks:{ color:'#8899aa' } } } }
+    });
+}
+
+function carregarTabela() {
+    const tbody = document.getElementById('corpoTabela');
+    const mes = document.getElementById('filtroMes').value;
+    const dia = document.getElementById('filtroDia').value;
+    const status = document.getElementById('filtroStatus').value;
+    let clientes = Object.entries(todosClientes);
+    if(mes) clientes = clientes.filter(([_,c]) => c.mes_referencia === mes);
+    if(dia) clientes = clientes.filter(([_,c]) => c.dia_vencimento == dia);
+    if(status) clientes = clientes.filter(([_,c]) => getStatus(c) === status);
+    if(clientes.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Nenhum cliente</td></tr>'; return; }
+    tbody.innerHTML = clientes.map(([id, c]) => {
+        const st = getStatus(c);
+        return `<tr>
+            <td><strong>${c.nome}</strong></td><td>${c.marca}</td>
+            <td>Dia ${c.dia_vencimento} - ${c.mes_referencia}</td>
+            <td>R$ ${(c.valor_total||0).toFixed(2)}</td>
+            <td>R$ ${calcAberto(c).toFixed(2)}</td>
+            <td>${contarPagas(c)}/${c.qtd_parcelas||0}</td>
+            <td><span class="badge badge-${st}">${st.toUpperCase()}</span></td>
+            <td>
+                <button class="btn-sm" onclick="abrirParcelas('${id}')"><i class="fas fa-cog"></i></button>
+                <button class="btn-sm danger" onclick="excluirCliente('${id}')"><i class="fas fa-trash"></i></button>
+            </td></tr>`;
+    }).join('');
+}
+
+function abrirModalCliente() {
+    document.getElementById('editId').value = '';
+    document.getElementById('modalTitulo').textContent = 'NOVO CLIENTE';
+    ['nome','marca','valorTotal'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('qtdParcelas').value = '1';
+    document.getElementById('previewParcela').textContent = '0,00';
+    document.getElementById('modalCliente').style.display = 'flex';
+}
+
+function fecharModal() { document.getElementById('modalCliente').style.display = 'none'; }
+
+function calcParcela() {
+    const t = parseFloat(document.getElementById('valorTotal').value) || 0;
+    const q = parseInt(document.getElementById('qtdParcelas').value) || 1;
+    document.getElementById('previewParcela').textContent = (t/q).toFixed(2);
+}
+
+async function salvarCliente() {
+    const nome = document.getElementById('nome').value.trim();
+    const marca = document.getElementById('marca').value.trim();
+    const valorTotal = parseFloat(document.getElementById('valorTotal').value);
+    const diaVencimento = parseInt(document.getElementById('diaVencimento').value);
+    const mesReferencia = document.getElementById('mesReferencia').value;
+    const qtdParcelas = parseInt(document.getElementById('qtdParcelas').value);
+    const editId = document.getElementById('editId').value;
+    if(!nome||!marca||!valorTotal||!mesReferencia){ alert('Preencha todos os campos!'); return; }
+    const valorParcela = valorTotal/qtdParcelas;
+    const parcelas = {};
+    const [ano, mes] = mesReferencia.split('-').map(Number);
+    for(let i=1; i<=qtdParcelas; i++) {
+        const venc = new Date(ano, mes-1+(i-1), diaVencimento);
+        parcelas[`p${i}`] = { numero:i, valor:valorParcela, vencimento:venc.toISOString().split('T')[0], status:'pendente', data_pagamento:null };
+    }
+    const dados = { nome, marca, valor_total:valorTotal, dia_vencimento:diaVencimento, mes_referencia:mesReferencia, qtd_parcelas:qtdParcelas, valor_parcela:valorParcela, parcelas, data_atualizacao:new Date().toISOString() };
+    if(editId) { await clientesRef.child(editId).update(dados); }
+    else { dados.data_cadastro = new Date().toISOString(); await clientesRef.push(dados); }
+    fecharModal();
+}
+
+async function excluirCliente(id) { if(confirm('Excluir?')) await clientesRef.child(id).remove(); }
+
+function abrirParcelas(id) {
+    const c = todosClientes[id];
+    if(!c) return;
+    document.getElementById('parcelasContainer').innerHTML = Object.entries(c.parcelas||{}).sort((a,b)=>a[1].numero-b[1].numero).map(([key,p]) => `
+        <div style="background:var(--bg3);padding:15px;border-radius:10px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
+            <div><strong>Parcela ${p.numero}</strong><br><small>Venc: ${new Date(p.vencimento).toLocaleDateString('pt-BR')}</small><br><small>R$ ${p.valor.toFixed(2)}</small></div>
+            <div>
+                <select id="st_${id}_${key}" class="input-full" style="width:160px;">
+                    ${['pendente','pago','quitado','finalizando','inadimplente'].map(s => `<option value="${s}" ${p.status===s?'selected':''}>${s.toUpperCase()}</option>`).join('')}
+                </select>
+                <button class="btn-sm" onclick="atualizarParcela('${id}','${key}')" style="width:100%;margin-top:5px;">ATUALIZAR</button>
+            </div>
+        </div>
+    `).join('');
+    document.getElementById('modalParcelas').style.display = 'flex';
+}
+
+function fecharModalParcelas() { document.getElementById('modalParcelas').style.display = 'none'; }
+
+async function atualizarParcela(id, key) {
+    const status = document.getElementById(`st_${id}_${key}`).value;
+    const dp = (status==='pago'||status==='quitado') ? new Date().toISOString() : null;
+    await clientesRef.child(`${id}/parcelas/${key}`).update({ status, data_pagamento:dp });
+    abrirParcelas(id);
+}
+
+function carregarRelatorios() {
+    const clientes = Object.values(todosClientes);
+    let tr=0, ta=0, tp=0, inad=0, d5c=0, d5r=0, d20c=0, d20r=0;
+    clientes.forEach(c => {
+        tr += calcRec(c); ta += calcAberto(c);
+        if(c.dia_vencimento===5){ d5c++; d5r+=calcRec(c); }
+        if(c.dia_vencimento===20){ d20c++; d20r+=calcRec(c); }
+        if(c.parcelas) Object.values(c.parcelas).forEach(p => { tp++; if(p.status==='inadimplente') inad++; });
+    });
+    document.getElementById('relClientes').textContent = clientes.length;
+    document.getElementById('relRecebido').textContent = `R$ ${tr.toFixed(2)}`;
+    document.getElementById('relAberto').textContent = `R$ ${ta.toFixed(2)}`;
+    document.getElementById('relInadimplencia').textContent = tp>0 ? ((inad/tp)*100).toFixed(1)+'%' : '0%';
+    document.getElementById('relDia5Clientes').textContent = d5c;
+    document.getElementById('relDia5Recebido').textContent = `R$ ${d5r.toFixed(2)}`;
+    document.getElementById('relDia20Clientes').textContent = d20c;
+    document.getElementById('relDia20Recebido').textContent = `R$ ${d20r.toFixed(2)}`;
+}
