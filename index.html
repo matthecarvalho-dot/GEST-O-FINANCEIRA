@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KRONOS SYSTEM | Gestão Financeira</title>
+    <title>KRONOS SYSTEM | Gestão Financeira Executiva</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -15,200 +15,384 @@
             <div class="login-logo">
                 <i class="fas fa-crown"></i>
                 <h1>KRONOS SYSTEM</h1>
-                <p>GESTÃO FINANCEIRA</p>
+                <p>GESTÃO FINANCEIRA EXECUTIVA</p>
             </div>
-            <div class="login-form">
-                <div class="input-group">
-                    <i class="fas fa-user"></i>
-                    <input type="text" id="loginUser" placeholder="Usuário" value="admin">
-                </div>
-                <div class="input-group">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" id="loginPass" placeholder="Senha" value="admin">
-                </div>
-                <button class="btn-login" onclick="fazerLogin()">
-                    <i class="fas fa-sign-in-alt"></i> ENTRAR NO SISTEMA
-                </button>
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" id="loginUser" placeholder="Usuário" value="admin">
             </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="loginPass" placeholder="Senha" value="admin">
+            </div>
+            <button class="btn-login" onclick="fazerLogin()">
+                <i class="fas fa-sign-in-alt"></i> ACESSAR SISTEMA
+            </button>
         </div>
     </div>
 
-    <!-- SISTEMA -->
+    <!-- SISTEMA PRINCIPAL -->
     <div class="main-system" id="mainSystem" style="display:none;">
         
-        <!-- HEADER -->
-        <header class="top-header">
-            <div class="brand">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
                 <i class="fas fa-chart-line"></i>
                 <div>
-                    <h1>KRONOS SYSTEM</h1>
-                    <span>Gestão Financeira</span>
+                    <h2>KRONOS</h2>
+                    <span>SYSTEM</span>
                 </div>
             </div>
-            <div class="header-actions">
-                <span id="dataAtual"></span>
-                <button onclick="sair()" class="btn-sair">
-                    <i class="fas fa-sign-out-alt"></i> Sair
+            
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" onclick="showPage('dashboard'); return false;">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showPage('clientes'); return false;">
+                    <i class="fas fa-users"></i>
+                    <span>Todos os Clientes</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showPage('dia5'); return false;">
+                    <i class="fas fa-calendar-day"></i>
+                    <span>Vencimento Dia 5</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showPage('dia20'); return false;">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Vencimento Dia 20</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showPage('parcelas'); return false;">
+                    <i class="fas fa-file-invoice"></i>
+                    <span>Todas as Parcelas</span>
+                </a>
+                <a href="#" class="nav-item" onclick="showPage('relatorios'); return false;">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Relatórios</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-badge">
+                    <i class="fas fa-user-circle"></i>
+                    <div>
+                        <strong id="sidebarUserName">Admin</strong>
+                        <small>Gerente Financeiro</small>
+                    </div>
+                </div>
+                <button class="btn-logout" onclick="sair()">
+                    <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
-        </header>
+        </aside>
 
-        <!-- NAV -->
-        <nav class="nav-tabs">
-            <button class="tab-btn active" onclick="mostrarPagina('dashboard')">
-                <i class="fas fa-chart-pie"></i> Dashboard
-            </button>
-            <button class="tab-btn" onclick="mostrarPagina('clientes')">
-                <i class="fas fa-users"></i> Clientes
-            </button>
-            <button class="tab-btn" onclick="mostrarPagina('relatorios')">
-                <i class="fas fa-file-alt"></i> Relatórios
-            </button>
-        </nav>
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            
+            <!-- TOP BAR -->
+            <header class="top-bar">
+                <h1 id="pageTitle">Dashboard</h1>
+                <div class="top-bar-right">
+                    <span id="currentDateTime"></span>
+                    <span class="badge-executivo" id="totalClientesBadge">0 clientes</span>
+                </div>
+            </header>
 
-        <!-- DASHBOARD -->
-        <div class="page-content" id="pagina-dashboard">
-            <div class="cards-grid">
-                <div class="resume-card">
-                    <div class="card-icon" style="background:#27ae60;"><i class="fas fa-check-circle"></i></div>
-                    <div class="card-text"><h3 id="cardPago">0</h3><p>PAGO</p></div>
+            <!-- ========== DASHBOARD ========== -->
+            <div class="page active" id="page-dashboard">
+                <!-- Cards de Status -->
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-icon bg-green"><i class="fas fa-check-circle"></i></div>
+                        <div class="kpi-info">
+                            <h3 id="kpiPago">0</h3>
+                            <p>PAGO</p>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon bg-gold"><i class="fas fa-star"></i></div>
+                        <div class="kpi-info">
+                            <h3 id="kpiQuitado">0</h3>
+                            <p>QUITADO</p>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon bg-orange"><i class="fas fa-spinner"></i></div>
+                        <div class="kpi-info">
+                            <h3 id="kpiFinalizando">0</h3>
+                            <p>FINALIZANDO</p>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon bg-red"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="kpi-info">
+                            <h3 id="kpiInadimplente">0</h3>
+                            <p>INADIMPLENTE</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="resume-card">
-                    <div class="card-icon" style="background:#c9a84c;"><i class="fas fa-star"></i></div>
-                    <div class="card-text"><h3 id="cardQuitado">0</h3><p>QUITADO</p></div>
+
+                <!-- Resumo Financeiro -->
+                <div class="resumo-grid">
+                    <div class="resumo-card">
+                        <h3><i class="fas fa-dollar-sign"></i> Total Recebido</h3>
+                        <strong id="resumoRecebido">R$ 0,00</strong>
+                    </div>
+                    <div class="resumo-card">
+                        <h3><i class="fas fa-clock"></i> Em Aberto</h3>
+                        <strong id="resumoAberto">R$ 0,00</strong>
+                    </div>
+                    <div class="resumo-card">
+                        <h3><i class="fas fa-percentage"></i> Inadimplência</h3>
+                        <strong id="resumoInadimplencia">0%</strong>
+                    </div>
                 </div>
-                <div class="resume-card">
-                    <div class="card-icon" style="background:#f39c12;"><i class="fas fa-spinner"></i></div>
-                    <div class="card-text"><h3 id="cardFinalizando">0</h3><p>FINALIZANDO</p></div>
+
+                <!-- Gráficos -->
+                <div class="charts-grid">
+                    <div class="chart-box">
+                        <h3>Pagamentos por Mês</h3>
+                        <canvas id="chartMensal" height="300"></canvas>
+                    </div>
+                    <div class="chart-box">
+                        <h3>Status das Parcelas</h3>
+                        <canvas id="chartStatus" height="300"></canvas>
+                    </div>
                 </div>
-                <div class="resume-card">
-                    <div class="card-icon" style="background:#e74c3c;"><i class="fas fa-exclamation-triangle"></i></div>
-                    <div class="card-text"><h3 id="cardInadimplente">0</h3><p>INADIMPLENTE</p></div>
+
+                <!-- Comparativo -->
+                <div class="chart-box full">
+                    <h3>Comparativo: Dia 5 vs Dia 20</h3>
+                    <canvas id="chartComparativo" height="200"></canvas>
                 </div>
             </div>
 
-            <div class="charts-row">
-                <div class="chart-box">
-                    <h3><i class="fas fa-chart-bar"></i> Pagamentos por Mês</h3>
-                    <canvas id="graficoMensal" height="300"></canvas>
+            <!-- ========== TODOS OS CLIENTES ========== -->
+            <div class="page" id="page-clientes">
+                <div class="filtros-bar">
+                    <input type="text" id="buscaCliente" placeholder="🔍 Buscar cliente..." onkeyup="carregarTabelaClientes()">
+                    <select id="filtroMesCliente" onchange="carregarTabelaClientes()">
+                        <option value="">Todos os Meses</option>
+                    </select>
+                    <button class="btn-add" onclick="abrirModalCliente()">
+                        <i class="fas fa-plus"></i> Novo Cliente
+                    </button>
                 </div>
-                <div class="chart-box">
-                    <h3><i class="fas fa-chart-pie"></i> Status das Parcelas</h3>
-                    <canvas id="graficoStatus" height="300"></canvas>
+                <div class="table-container">
+                    <table class="executive-table">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Marca</th>
+                                <th>Vencimento</th>
+                                <th>Valor Total</th>
+                                <th>Parcelas</th>
+                                <th>Em Aberto</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaTodosClientes"></tbody>
+                    </table>
                 </div>
             </div>
 
-            <div class="chart-box full-width">
-                <h3><i class="fas fa-balance-scale"></i> Comparativo: Dia 5 vs Dia 20</h3>
-                <canvas id="graficoDias" height="250"></canvas>
+            <!-- ========== DIA 5 ========== -->
+            <div class="page" id="page-dia5">
+                <div class="page-header-section">
+                    <h2><i class="fas fa-calendar-day"></i> Clientes com Vencimento Dia 5</h2>
+                    <span id="totalDia5">0 clientes</span>
+                </div>
+                <div class="table-container">
+                    <table class="executive-table">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Marca</th>
+                                <th>Mês Ref.</th>
+                                <th>Valor Total</th>
+                                <th>Parcelas</th>
+                                <th>Em Aberto</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaDia5"></tbody>
+                    </table>
+                </div>
             </div>
-        </div>
 
-        <!-- CLIENTES -->
-        <div class="page-content" id="pagina-clientes" style="display:none;">
-            <div class="filtros-bar">
-                <select id="filtroMes" onchange="carregarTabela()"><option value="">Todos os Meses</option></select>
-                <select id="filtroDia" onchange="carregarTabela()">
-                    <option value="">Todos os Dias</option>
-                    <option value="5">Dia 5</option>
-                    <option value="20">Dia 20</option>
-                </select>
-                <select id="filtroStatus" onchange="carregarTabela()">
-                    <option value="">Todos os Status</option>
-                    <option value="pago">PAGO</option>
-                    <option value="quitado">QUITADO</option>
-                    <option value="finalizando">FINALIZANDO</option>
-                    <option value="inadimplente">INADIMPLENTE</option>
-                </select>
-                <button class="btn-add" onclick="abrirModalCliente()">
-                    <i class="fas fa-plus"></i> NOVO CLIENTE
+            <!-- ========== DIA 20 ========== -->
+            <div class="page" id="page-dia20">
+                <div class="page-header-section">
+                    <h2><i class="fas fa-calendar-check"></i> Clientes com Vencimento Dia 20</h2>
+                    <span id="totalDia20">0 clientes</span>
+                </div>
+                <div class="table-container">
+                    <table class="executive-table">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Marca</th>
+                                <th>Mês Ref.</th>
+                                <th>Valor Total</th>
+                                <th>Parcelas</th>
+                                <th>Em Aberto</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaDia20"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ========== PARCELAS ========== -->
+            <div class="page" id="page-parcelas">
+                <div class="filtros-bar">
+                    <select id="filtroStatusParcela" onchange="carregarTodasParcelas()">
+                        <option value="">Todos os Status</option>
+                        <option value="pago">Pago</option>
+                        <option value="quitado">Quitado</option>
+                        <option value="finalizando">Finalizando</option>
+                        <option value="inadimplente">Inadimplente</option>
+                        <option value="pendente">Pendente</option>
+                    </select>
+                    <select id="filtroDiaParcela" onchange="carregarTodasParcelas()">
+                        <option value="">Todos os Dias</option>
+                        <option value="5">Dia 5</option>
+                        <option value="20">Dia 20</option>
+                    </select>
+                </div>
+                <div class="table-container">
+                    <table class="executive-table">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Parcela</th>
+                                <th>Valor</th>
+                                <th>Vencimento</th>
+                                <th>Status</th>
+                                <th>Pagamento</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaParcelas"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ========== RELATÓRIOS ========== -->
+            <div class="page" id="page-relatorios">
+                <div class="relatorio-grid">
+                    <div class="relatorio-card">
+                        <h3>Resumo Geral</h3>
+                        <div class="relatorio-row"><span>Total Clientes</span><strong id="relClientes">0</strong></div>
+                        <div class="relatorio-row"><span>Total Recebido</span><strong id="relRecebido">R$ 0,00</strong></div>
+                        <div class="relatorio-row"><span>Em Aberto</span><strong id="relAberto">R$ 0,00</strong></div>
+                        <div class="relatorio-row"><span>Inadimplência</span><strong id="relInadimplencia">0%</strong></div>
+                    </div>
+                    <div class="relatorio-card">
+                        <h3>Dia 5</h3>
+                        <div class="relatorio-row"><span>Clientes</span><strong id="relDia5Cli">0</strong></div>
+                        <div class="relatorio-row"><span>Recebido</span><strong id="relDia5Rec">R$ 0,00</strong></div>
+                        <div class="relatorio-row"><span>Em Aberto</span><strong id="relDia5Ab">R$ 0,00</strong></div>
+                    </div>
+                    <div class="relatorio-card">
+                        <h3>Dia 20</h3>
+                        <div class="relatorio-row"><span>Clientes</span><strong id="relDia20Cli">0</strong></div>
+                        <div class="relatorio-row"><span>Recebido</span><strong id="relDia20Rec">R$ 0,00</strong></div>
+                        <div class="relatorio-row"><span>Em Aberto</span><strong id="relDia20Ab">R$ 0,00</strong></div>
+                    </div>
+                </div>
+                <button class="btn-add" onclick="window.print()" style="margin:20px;">
+                    <i class="fas fa-print"></i> Imprimir Relatório
                 </button>
             </div>
 
-            <div class="tabela-wrapper">
-                <table class="tabela-executiva">
-                    <thead>
-                        <tr>
-                            <th>CLIENTE</th><th>MARCA</th><th>VENCIMENTO</th>
-                            <th>VALOR TOTAL</th><th>EM ABERTO</th>
-                            <th>PARCELAS</th><th>STATUS</th><th>AÇÕES</th>
-                        </tr>
-                    </thead>
-                    <tbody id="corpoTabela">
-                        <tr><td colspan="8" style="text-align:center;">Carregando...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- RELATÓRIOS -->
-        <div class="page-content" id="pagina-relatorios" style="display:none;">
-            <div class="relatorio-grid">
-                <div class="relatorio-card">
-                    <h3>RESUMO GERAL</h3>
-                    <div class="relatorio-item"><span>Total Clientes:</span> <strong id="relClientes">0</strong></div>
-                    <div class="relatorio-item"><span>Total Recebido:</span> <strong id="relRecebido">R$ 0,00</strong></div>
-                    <div class="relatorio-item"><span>Em Aberto:</span> <strong id="relAberto">R$ 0,00</strong></div>
-                    <div class="relatorio-item"><span>Inadimplência:</span> <strong id="relInadimplencia">0%</strong></div>
-                </div>
-                <div class="relatorio-card">
-                    <h3>DIA 5</h3>
-                    <div class="relatorio-item"><span>Clientes:</span> <strong id="relDia5Clientes">0</strong></div>
-                    <div class="relatorio-item"><span>Recebido:</span> <strong id="relDia5Recebido">R$ 0,00</strong></div>
-                </div>
-                <div class="relatorio-card">
-                    <h3>DIA 20</h3>
-                    <div class="relatorio-item"><span>Clientes:</span> <strong id="relDia20Clientes">0</strong></div>
-                    <div class="relatorio-item"><span>Recebido:</span> <strong id="relDia20Recebido">R$ 0,00</strong></div>
-                </div>
-            </div>
-            <button class="btn-add" onclick="window.print()" style="margin:20px 25px;">
-                <i class="fas fa-print"></i> IMPRIMIR RELATÓRIO
-            </button>
-        </div>
+        </main>
     </div>
 
     <!-- MODAL CLIENTE -->
     <div class="modal-overlay" id="modalCliente" style="display:none;">
         <div class="modal-box">
             <div class="modal-header">
-                <h2 id="modalTitulo">NOVO CLIENTE</h2>
-                <button onclick="fecharModal()">&times;</button>
+                <h2>NOVO CLIENTE</h2>
+                <button onclick="fecharModalCliente()">&times;</button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="editId">
-                <label>NOME DO CLIENTE</label>
-                <input type="text" id="nome" class="input-full" placeholder="Nome completo">
-                <label>MARCA</label>
-                <input type="text" id="marca" class="input-full" placeholder="Nome da marca">
-                <div class="input-row">
-                    <div><label>VALOR TOTAL (R$)</label><input type="number" id="valorTotal" class="input-full" step="0.01" onkeyup="calcParcela()"></div>
-                    <div><label>DIA VENCIMENTO</label><select id="diaVencimento" class="input-full"><option value="5">DIA 5</option><option value="20">DIA 20</option></select></div>
+                
+                <label>NOME DO CLIENTE *</label>
+                <input type="text" id="nomeCliente" class="input-full" placeholder="Nome completo do cliente">
+                
+                <label>NOME DA MARCA *</label>
+                <input type="text" id="marcaCliente" class="input-full" placeholder="Nome da marca">
+                
+                <div class="input-row-2">
+                    <div>
+                        <label>VALOR TOTAL (R$) *</label>
+                        <input type="number" id="valorTotal" class="input-full" step="0.01" onkeyup="calcParcela()">
+                    </div>
+                    <div>
+                        <label>TOTAL DE PARCELAS *</label>
+                        <input type="number" id="qtdParcelas" class="input-full" min="1" value="1" onkeyup="calcParcela()">
+                    </div>
                 </div>
-                <div class="input-row">
-                    <div><label>MÊS REFERÊNCIA</label><input type="month" id="mesReferencia" class="input-full"></div>
-                    <div><label>QTD PARCELAS</label><input type="number" id="qtdParcelas" class="input-full" min="1" value="1" onkeyup="calcParcela()"></div>
+
+                <div class="input-row-2">
+                    <div>
+                        <label>DIA DE VENCIMENTO *</label>
+                        <select id="diaVencimento" class="input-full">
+                            <option value="5">DIA 5</option>
+                            <option value="20">DIA 20</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>MÊS DE REFERÊNCIA *</label>
+                        <input type="month" id="mesReferencia" class="input-full">
+                    </div>
                 </div>
-                <div class="parcela-preview">💰 Valor de cada parcela: <strong>R$ <span id="previewParcela">0,00</span></strong></div>
+
+                <div class="parcela-preview">
+                    💰 <strong>Valor de cada parcela: R$ <span id="previewParcela">0,00</span></strong>
+                    <br><small id="previewParcelas"></small>
+                </div>
             </div>
             <div class="modal-footer">
-                <button class="btn-cancelar" onclick="fecharModal()">CANCELAR</button>
-                <button class="btn-salvar" onclick="salvarCliente()">SALVAR</button>
+                <button class="btn-cancelar" onclick="fecharModalCliente()">CANCELAR</button>
+                <button class="btn-salvar" onclick="salvarCliente()">SALVAR CLIENTE</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL PARCELAS -->
-    <div class="modal-overlay" id="modalParcelas" style="display:none;">
-        <div class="modal-box">
+    <!-- MODAL EDITAR PARCELA -->
+    <div class="modal-overlay" id="modalParcela" style="display:none;">
+        <div class="modal-box modal-sm">
             <div class="modal-header">
-                <h2>GERENCIAR PARCELAS</h2>
-                <button onclick="fecharModalParcelas()">&times;</button>
+                <h2>ATUALIZAR PARCELA</h2>
+                <button onclick="fecharModalParcela()">&times;</button>
             </div>
-            <div class="modal-body" id="parcelasContainer"></div>
+            <div class="modal-body">
+                <p id="infoParcela"></p>
+                <label>NOVO STATUS</label>
+                <select id="novoStatus" class="input-full">
+                    <option value="pendente">PENDENTE</option>
+                    <option value="pago">PAGO</option>
+                    <option value="quitado">QUITADO</option>
+                    <option value="finalizando">FINALIZANDO</option>
+                    <option value="inadimplente">INADIMPLENTE</option>
+                </select>
+                <input type="hidden" id="parcelaClienteId">
+                <input type="hidden" id="parcelaKey">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancelar" onclick="fecharModalParcela()">CANCELAR</button>
+                <button class="btn-salvar" onclick="atualizarStatusParcela()">ATUALIZAR</button>
+            </div>
         </div>
     </div>
 
+    <!-- SCRIPTS -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
