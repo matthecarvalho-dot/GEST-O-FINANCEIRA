@@ -1,9 +1,9 @@
 // ============================================
-// KRONOS SYSTEM - Gestão Financeira
+// KRONOS SYSTEM - Gestão Financeira Executiva
 // Firebase Realtime Database
 // ============================================
 
-// Configuração Firebase (SUAS CREDENCIAIS)
+// Configuração Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyD6Mv3DiNGWCoC4Rd0iOt6L22qxnS-XAhY",
     authDomain: "kronos-gestao-fincanceira.firebaseapp.com",
@@ -18,439 +18,387 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 const clientesRef = database.ref('kronos_system/clientes');
-const configuracoesRef = database.ref('kronos_system/configuracoes');
 
-// Variável global para clientes
+// Variáveis globais
 let todosClientes = {};
-let modalCliente, modalParcelas;
+let charts = {};
+let paginaAtual = 'dashboard';
 
 // ============================================
 // INICIALIZAÇÃO
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar modais
-    modalCliente = new bootstrap.Modal(document.getElementById('modalCliente'));
-    modalParcelas = new bootstrap.Modal(document.getElementById('modalParcelas'));
+    // Esconder loading
+    setTimeout(() => {
+        document.getElementById('loadingScreen').style.opacity = '0';
+        setTimeout(() => {
+            document.getElementById('loadingScreen').style.display = 'none';
+        }, 500);
+    }, 1500);
     
-    // Atualizar data/hora
+    // Inicializar
     atualizarDataHora();
-    setInterval(atualizarDataHora, 30000);
-    
-    // Carregar meses
+    setInterval(atualizarDataHora, 60000);
     carregarMeses();
-    
-    // Carregar dados
     carregarClientes();
-    
-    // Calcular valor da parcela em tempo real
-    document.getElementById('valorTotal').addEventListener('input', calcularParcela);
-    document.getElementById('qtdParcelas').addEventListener('input', calcularParcela);
-    
-    // Verificar se banco existe, senão criar
+    inicializarNavegacao();
     verificarBancoDados();
 });
 
 // ============================================
-// FUNÇÕES DE DADOS
+// NAVEGAÇÃO
 // ============================================
+function inicializarNavegacao() {
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const page = this.dataset.page;
+            navegarPara(page);
+        });
+    });
+}
 
-// Verificar e criar banco se necessário
+function navegarPara(page) {
+    // Atualizar nav
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.dataset.page === page) item.classList.add('active');
+    });
+    
+    // Atualizar páginas
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(`page-${page}`).classList.add('active');
+    
+    paginaAtual = page;
+    
+    // Carregar conteúdo específico
+    switch(page) {
+        case 'dashboard': atualizarDashboard(); break;
+        case 'clientes': renderizarClientes(); break;
+        case 'relatorios': carregarRelatorios(); break;
+        case 'comparativo': carregarComparativo(); break;
+    }
+}
+
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('collapsed');
+}
+
+// ============================================
+// BANCO DE DADOS
+// ============================================
 async function verificarBancoDados() {
     const snapshot = await database.ref('kronos_system').once('value');
     
     if (!snapshot.exists()) {
-        console.log('Criando estrutura inicial...');
-        
+        console.log('🔄 Criando estrutura inicial...');
         await database.ref('kronos_system').set({
             configuracoes: {
-                empresa: {
-                    nome: "KRONOS SYSTEM",
-                    sistema: "Gestão Financeira",
-                    versao: "1.0.0",
-                    criado_em: new Date().toISOString()
-                },
-                status: ["pago", "quitado", "finalizando", "inadimplente", "pendente"],
-                dias_vencimento: [5, 20]
+                empresa: "KRONOS SYSTEM",
+                versao: "2.0",
+                criado_em: new Date().toISOString()
             },
             clientes: {
                 _exemplo: {
                     nome: "EMPRESA EXEMPLO LTDA",
-                    marca: "MARCA XYZ",
-                    valor_total: 5000.00,
+                    marca: "MARCA PREMIUM",
+                    valor_total: 15000,
                     dia_vencimento: 5,
                     mes_referencia: "2024-01",
-                    qtd_parcelas: 5,
-                    valor_parcela: 1000.00,
+                    qtd_parcelas: 12,
+                    valor_parcela: 1250,
                     data_cadastro: new Date().toISOString(),
                     parcelas: {
-                        parcela_1: { numero: 1, valor: 1000.00, vencimento: "2024-01-05", status: "pago", data_pagamento: "2024-01-04" },
-                        parcela_2: { numero: 2, valor: 1000.00, vencimento: "2024-02-05", status: "quitado", data_pagamento: "2024-02-01" },
-                        parcela_3: { numero: 3, valor: 1000.00, vencimento: "2024-03-05", status: "finalizando", data_pagamento: null },
-                        parcela_4: { numero: 4, valor: 1000.00, vencimento: "2024-04-05", status: "inadimplente", data_pagamento: null },
-                        parcela_5: { numero: 5, valor: 1000.00, vencimento: "2024-05-05", status: "pendente", data_pagamento: null }
+                        parcela_1: { numero:1, valor:1250, vencimento:"2024-01-05", status:"pago", data_pagamento:"2024-01-04" },
+                        parcela_2: { numero:2, valor:1250, vencimento:"2024-02-05", status:"pago", data_pagamento:"2024-02-03" },
+                        parcela_3: { numero:3, valor:1250, vencimento:"2024-03-05", status:"quitado", data_pagamento:"2024-03-01" },
+                        parcela_4: { numero:4, valor:1250, vencimento:"2024-04-05", status:"finalizando", data_pagamento:null },
+                        parcela_5: { numero:5, valor:1250, vencimento:"2024-05-05", status:"inadimplente", data_pagamento:null }
                     }
                 }
             }
         });
-        
-        console.log('✅ Banco de dados inicializado!');
+        console.log('✅ Banco inicializado!');
         carregarClientes();
     }
 }
 
-// Carregar clientes
 function carregarClientes() {
     clientesRef.on('value', (snapshot) => {
         todosClientes = snapshot.val() || {};
-        aplicarFiltros();
-        atualizarContadores();
+        renderizarClientes();
+        atualizarDashboard();
+        atualizarQuickStats();
     });
 }
 
-// Aplicar filtros
-function aplicarFiltros() {
-    const mes = document.getElementById('mesFiltro').value;
-    const dia = document.getElementById('diaFiltro').value;
-    const status = document.getElementById('statusFiltro').value;
-    
-    let clientesFiltrados = Object.entries(todosClientes).filter(([id, cliente]) => {
-        if (id === '_exemplo') return true; // Sempre mostrar exemplo
-        
-        let mostrar = true;
-        
-        if (mes && cliente.mes_referencia !== mes) mostrar = false;
-        if (dia && cliente.dia_vencimento != dia) mostrar = false;
-        if (status && calcularStatusGeral(cliente) !== status) mostrar = false;
-        
-        return mostrar;
-    });
-    
-    renderizarTabela(clientesFiltrados);
-}
-
-// Renderizar tabela
-function renderizarTabela(clientes) {
-    const tbody = document.getElementById('tabelaClientes');
-    document.getElementById('totalRegistros').textContent = `${clientes.length} registros`;
-    
-    if (clientes.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center">Nenhum cliente encontrado</td></tr>';
-        return;
-    }
-    
-    tbody.innerHTML = clientes.map(([id, cliente]) => {
-        const status = calcularStatusGeral(cliente);
-        const valorEmAberto = calcularValorEmAberto(cliente);
-        const parcelasPagas = contarParcelasPagas(cliente);
-        
-        return `
-            <tr>
-                <td><strong>${cliente.nome}</strong></td>
-                <td>${cliente.marca}</td>
-                <td>Dia ${cliente.dia_vencimento} - ${formatarMes(cliente.mes_referencia)}</td>
-                <td>R$ ${cliente.valor_total.toFixed(2)}</td>
-                <td>R$ ${valorEmAberto.toFixed(2)}</td>
-                <td>${parcelasPagas}/${cliente.qtd_parcelas}</td>
-                <td><span class="badge-status badge-${status}">${status.toUpperCase()}</span></td>
-                <td>
-                    <button class="btn-acao" onclick="gerenciarParcelas('${id}')" title="Gerenciar Parcelas">
-                        <i class="fas fa-cog"></i>
-                    </button>
-                    <button class="btn-acao" onclick="editarCliente('${id}')" title="Editar">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn-acao excluir" onclick="excluirCliente('${id}')" title="Excluir">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
-        `;
-    }).join('');
-}
-
 // ============================================
-// CRUD CLIENTES
+// DASHBOARD
 // ============================================
-
-function abrirModalCliente() {
-    document.getElementById('formCliente').reset();
-    document.getElementById('clienteId').value = '';
-    document.getElementById('modalTitulo').textContent = 'NOVO CLIENTE';
-    document.getElementById('valorParcelaPreview').textContent = '0,00';
-    modalCliente.show();
-}
-
-function editarCliente(id) {
-    const cliente = todosClientes[id];
-    if (!cliente) return;
-    
-    document.getElementById('clienteId').value = id;
-    document.getElementById('nomeCliente').value = cliente.nome;
-    document.getElementById('marca').value = cliente.marca;
-    document.getElementById('valorTotal').value = cliente.valor_total;
-    document.getElementById('diaVencimento').value = cliente.dia_vencimento;
-    document.getElementById('mesReferencia').value = cliente.mes_referencia;
-    document.getElementById('qtdParcelas').value = cliente.qtd_parcelas;
-    
-    document.getElementById('modalTitulo').textContent = 'EDITAR CLIENTE';
-    calcularParcela();
-    modalCliente.show();
-}
-
-async function salvarCliente() {
-    const id = document.getElementById('clienteId').value;
-    const nome = document.getElementById('nomeCliente').value.trim();
-    const marca = document.getElementById('marca').value.trim();
-    const valorTotal = parseFloat(document.getElementById('valorTotal').value);
-    const diaVencimento = parseInt(document.getElementById('diaVencimento').value);
-    const mesReferencia = document.getElementById('mesReferencia').value;
-    const qtdParcelas = parseInt(document.getElementById('qtdParcelas').value);
-    const statusInicial = document.getElementById('statusInicial').value;
-    
-    if (!nome || !marca || !valorTotal || !mesReferencia || !qtdParcelas) {
-        alert('Preencha todos os campos obrigatórios!');
-        return;
-    }
-    
-    const valorParcela = valorTotal / qtdParcelas;
-    
-    // Criar parcelas
-    const parcelas = {};
-    const [ano, mes] = mesReferencia.split('-').map(Number);
-    
-    for (let i = 1; i <= qtdParcelas; i++) {
-        const dataVencimento = new Date(ano, mes - 1 + (i - 1), diaVencimento);
-        const dataFormatada = dataVencimento.toISOString().split('T')[0];
-        
-        parcelas[`parcela_${i}`] = {
-            numero: i,
-            valor: valorParcela,
-            vencimento: dataFormatada,
-            status: i === 1 ? statusInicial : 'pendente',
-            data_pagamento: i === 1 && statusInicial === 'pago' ? new Date().toISOString() : null
-        };
-    }
-    
-    const dadosCliente = {
-        nome,
-        marca,
-        valor_total: valorTotal,
-        dia_vencimento: diaVencimento,
-        mes_referencia: mesReferencia,
-        qtd_parcelas: qtdParcelas,
-        valor_parcela: valorParcela,
-        data_atualizacao: new Date().toISOString(),
-        parcelas
-    };
-    
-    try {
-        if (id) {
-            // Atualizar existente
-            await clientesRef.child(id).update(dadosCliente);
-        } else {
-            // Novo cliente
-            dadosCliente.data_cadastro = new Date().toISOString();
-            await clientesRef.push(dadosCliente);
-        }
-        
-        modalCliente.hide();
-        console.log('✅ Cliente salvo com sucesso!');
-        
-    } catch (error) {
-        console.error('Erro ao salvar:', error);
-        alert('Erro ao salvar cliente!');
-    }
-}
-
-async function excluirCliente(id) {
-    if (!confirm('Tem certeza que deseja excluir este cliente?')) return;
-    
-    try {
-        await clientesRef.child(id).remove();
-        console.log('✅ Cliente excluído!');
-    } catch (error) {
-        console.error('Erro ao excluir:', error);
-        alert('Erro ao excluir cliente!');
-    }
-}
-
-// ============================================
-// GERENCIAR PARCELAS
-// ============================================
-
-function gerenciarParcelas(clienteId) {
-    const cliente = todosClientes[clienteId];
-    if (!cliente) return;
-    
-    document.getElementById('clienteNomeParcelas').textContent = cliente.nome;
-    
-    const container = document.getElementById('parcelasContainer');
-    const parcelas = Object.entries(cliente.parcelas).sort((a, b) => a[1].numero - b[1].numero);
-    
-    container.innerHTML = parcelas.map(([key, parcela]) => {
-        const statusOptions = ['pendente', 'pago', 'quitado', 'finalizando', 'inadimplente']
-            .map(s => `<option value="${s}" ${parcela.status === s ? 'selected' : ''}>${s.toUpperCase()}</option>`)
-            .join('');
-        
-        return `
-            <div class="parcela-card">
-                <div>
-                    <strong>Parcela ${parcela.numero}</strong><br>
-                    <small>Vencimento: ${formatarData(parcela.vencimento)}</small><br>
-                    <small>Valor: R$ ${parcela.valor.toFixed(2)}</small>
-                </div>
-                <div>
-                    <select class="form-select custom-select mb-2" id="status_${clienteId}_${key}" style="width: 180px;">
-                        ${statusOptions}
-                    </select>
-                    <button class="btn-acao" onclick="atualizarStatusParcela('${clienteId}', '${key}')" style="width: 100%;">
-                        <i class="fas fa-check"></i> ATUALIZAR
-                    </button>
-                </div>
-            </div>
-        `;
-    }).join('');
-    
-    modalParcelas.show();
-}
-
-async function atualizarStatusParcela(clienteId, parcelaKey) {
-    const selectId = `status_${clienteId}_${parcelaKey}`;
-    const novoStatus = document.getElementById(selectId).value;
-    const dataPagamento = novoStatus === 'pago' || novoStatus === 'quitado' 
-        ? new Date().toISOString() 
-        : null;
-    
-    try {
-        await clientesRef.child(`${clienteId}/parcelas/${parcelaKey}`).update({
-            status: novoStatus,
-            data_pagamento: dataPagamento
-        });
-        
-        console.log('✅ Status atualizado!');
-        gerenciarParcelas(clienteId); // Recarregar
-    } catch (error) {
-        console.error('Erro ao atualizar:', error);
-        alert('Erro ao atualizar status!');
-    }
-}
-
-// ============================================
-// FUNÇÕES AUXILIARES
-// ============================================
-
-function calcularStatusGeral(cliente) {
-    if (!cliente.parcelas) return 'pendente';
-    
-    const parcelas = Object.values(cliente.parcelas);
-    const total = parcelas.length;
-    const pagas = parcelas.filter(p => p.status === 'pago' || p.status === 'quitado').length;
-    const inadimplentes = parcelas.filter(p => p.status === 'inadimplente').length;
-    
-    if (pagas === total) return 'quitado';
-    if (inadimplentes > 0) return 'inadimplente';
-    if (pagas > 0) return 'finalizando';
-    if (parcelas.some(p => p.status === 'pago')) return 'pago';
-    return 'pendente';
-}
-
-function calcularValorEmAberto(cliente) {
-    if (!cliente.parcelas) return cliente.valor_total || 0;
-    
-    return Object.values(cliente.parcelas)
-        .filter(p => p.status !== 'pago' && p.status !== 'quitado')
-        .reduce((total, p) => total + p.valor, 0);
-}
-
-function contarParcelasPagas(cliente) {
-    if (!cliente.parcelas) return 0;
-    
-    return Object.values(cliente.parcelas)
-        .filter(p => p.status === 'pago' || p.status === 'quitado')
-        .length;
-}
-
-function atualizarContadores() {
+function atualizarDashboard() {
     const clientes = Object.values(todosClientes);
+    const ano = document.getElementById('dashboardAno').value;
     
-    const contadores = {
-        pago: 0,
-        quitado: 0,
-        finalizando: 0,
-        inadimplente: 0
-    };
+    // Filtrar por ano
+    const clientesAno = clientes.filter(c => {
+        if (!c.mes_referencia) return false;
+        return c.mes_referencia.startsWith(ano);
+    });
+    
+    // KPIs
+    const totalClientes = clientesAno.length;
+    const totalRecebido = calcularTotalRecebido(clientesAno);
+    const totalEmAberto = calcularTotalEmAberto(clientesAno);
+    const taxaInadimplencia = calcularTaxaInadimplencia(clientesAno);
+    
+    document.getElementById('kpiTotalClientes').textContent = totalClientes;
+    document.getElementById('kpiTotalRecebido').textContent = formatarMoeda(totalRecebido);
+    document.getElementById('kpiEmAberto').textContent = formatarMoeda(totalEmAberto);
+    document.getElementById('kpiInadimplencia').textContent = taxaInadimplencia.toFixed(1) + '%';
+    
+    // Gráficos
+    criarGraficoPagamentosMensais(clientesAno, ano);
+    criarGraficoStatusParcelas(clientesAno);
+    criarGraficoPagamentosDia(clientesAno);
+    carregarUltimosPagamentos(clientesAno);
+}
+
+function criarGraficoPagamentosMensais(clientes, ano) {
+    const ctx = document.getElementById('chartPagamentosMensais').getContext('2d');
+    
+    // Destruir gráfico anterior se existir
+    if (charts.pagamentosMensais) charts.pagamentosMensais.destroy();
+    
+    const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    const recebido = new Array(12).fill(0);
+    const emAberto = new Array(12).fill(0);
     
     clientes.forEach(cliente => {
-        const status = calcularStatusGeral(cliente);
-        if (contadores[status] !== undefined) {
-            contadores[status]++;
-        }
+        if (!cliente.parcelas) return;
+        
+        Object.values(cliente.parcelas).forEach(parcela => {
+            const data = new Date(parcela.vencimento);
+            if (data.getFullYear() == ano) {
+                const mes = data.getMonth();
+                if (parcela.status === 'pago' || parcela.status === 'quitado') {
+                    recebido[mes] += parcela.valor;
+                } else {
+                    emAberto[mes] += parcela.valor;
+                }
+            }
+        });
     });
     
-    document.getElementById('countPago').textContent = contadores.pago;
-    document.getElementById('countQuitado').textContent = contadores.quitado;
-    document.getElementById('countFinalizando').textContent = contadores.finalizando;
-    document.getElementById('countInadimplente').textContent = contadores.inadimplente;
+    charts.pagamentosMensais = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: meses,
+            datasets: [
+                {
+                    label: 'Recebido',
+                    data: recebido,
+                    backgroundColor: 'rgba(46, 204, 113, 0.6)',
+                    borderColor: '#2ecc71',
+                    borderWidth: 1,
+                    borderRadius: 5
+                },
+                {
+                    label: 'Em Aberto',
+                    data: emAberto,
+                    backgroundColor: 'rgba(231, 76, 60, 0.6)',
+                    borderColor: '#e74c3c',
+                    borderWidth: 1,
+                    borderRadius: 5
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: { color: '#b0c4d8' }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    ticks: { color: '#b0c4d8' }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#b0c4d8' }
+                }
+            }
+        }
+    });
 }
 
-function filtrarPorStatus(status) {
-    document.getElementById('statusFiltro').value = status;
-    aplicarFiltros();
-}
-
-function limparFiltros() {
-    document.getElementById('mesFiltro').value = '';
-    document.getElementById('diaFiltro').value = '';
-    document.getElementById('statusFiltro').value = '';
-    aplicarFiltros();
-}
-
-function calcularParcela() {
-    const valorTotal = parseFloat(document.getElementById('valorTotal').value) || 0;
-    const qtdParcelas = parseInt(document.getElementById('qtdParcelas').value) || 1;
-    const valorParcela = valorTotal / qtdParcelas;
+function criarGraficoStatusParcelas(clientes) {
+    const ctx = document.getElementById('chartStatusParcelas').getContext('2d');
+    if (charts.statusParcelas) charts.statusParcelas.destroy();
     
-    document.getElementById('valorParcelaPreview').textContent = valorParcela.toFixed(2);
+    const status = { pago: 0, quitado: 0, finalizando: 0, inadimplente: 0, pendente: 0 };
+    
+    clientes.forEach(cliente => {
+        if (!cliente.parcelas) return;
+        Object.values(cliente.parcelas).forEach(parcela => {
+            if (status[parcela.status] !== undefined) status[parcela.status]++;
+        });
+    });
+    
+    charts.statusParcelas = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Pago', 'Quitado', 'Finalizando', 'Inadimplente', 'Pendente'],
+            datasets: [{
+                data: Object.values(status),
+                backgroundColor: [
+                    '#2ecc71', '#d4a843', '#f39c12', '#e74c3c', '#3498db'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: '#b0c4d8', padding: 15 }
+                }
+            }
+        }
+    });
 }
 
-function carregarMeses() {
-    const select = document.getElementById('mesFiltro');
-    const dataAtual = new Date();
+function criarGraficoPagamentosDia(clientes) {
+    const ctx = document.getElementById('chartPagamentosDia').getContext('2d');
+    if (charts.pagamentosDia) charts.pagamentosDia.destroy();
     
-    for (let i = -6; i <= 6; i++) {
-        const data = new Date(dataAtual.getFullYear(), dataAtual.getMonth() + i, 1);
-        const valor = `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, '0')}`;
-        const nome = data.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+    let dia5 = { recebido: 0, total: 0 };
+    let dia20 = { recebido: 0, total: 0 };
+    
+    clientes.forEach(cliente => {
+        if (!cliente.parcelas) return;
         
-        const option = document.createElement('option');
-        option.value = valor;
-        option.textContent = nome.toUpperCase();
-        select.appendChild(option);
-    }
+        Object.values(cliente.parcelas).forEach(parcela => {
+            const dia = new Date(parcela.vencimento).getDate();
+            if (dia === 5) {
+                dia5.total += parcela.valor;
+                if (parcela.status === 'pago' || parcela.status === 'quitado') dia5.recebido += parcela.valor;
+            } else if (dia === 20) {
+                dia20.total += parcela.valor;
+                if (parcela.status === 'pago' || parcela.status === 'quitado') dia20.recebido += parcela.valor;
+            }
+        });
+    });
+    
+    charts.pagamentosDia = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Dia 5', 'Dia 20'],
+            datasets: [
+                {
+                    label: 'Total',
+                    data: [dia5.total, dia20.total],
+                    backgroundColor: 'rgba(52, 152, 219, 0.6)',
+                    borderRadius: 5
+                },
+                {
+                    label: 'Recebido',
+                    data: [dia5.recebido, dia20.recebido],
+                    backgroundColor: 'rgba(46, 204, 113, 0.8)',
+                    borderRadius: 5
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: { color: '#b0c4d8' }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    ticks: { color: '#b0c4d8' }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#b0c4d8' }
+                }
+            }
+        }
+    });
 }
 
-function atualizarDataHora() {
-    const agora = new Date();
-    const formato = { 
-        weekday: 'long', 
-        day: 'numeric', 
-        month: 'long', 
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    };
-    document.getElementById('currentDateTime').textContent = 
-        agora.toLocaleDateString('pt-BR', formato);
+function carregarUltimosPagamentos(clientes) {
+    const container = document.getElementById('ultimosPagamentos');
+    let pagamentos = [];
+    
+    clientes.forEach(cliente => {
+        if (!cliente.parcelas) return;
+        Object.values(cliente.parcelas).forEach(parcela => {
+            if (parcela.data_pagamento && (parcela.status === 'pago' || parcela.status === 'quitado')) {
+                pagamentos.push({
+                    cliente: cliente.nome,
+                    valor: parcela.valor,
+                    data: parcela.data_pagamento,
+                    parcela: parcela.numero
+                });
+            }
+        });
+    });
+    
+    // Ordenar por data (mais recentes primeiro)
+    pagamentos.sort((a, b) => new Date(b.data) - new Date(a.data));
+    pagamentos = pagamentos.slice(0, 10);
+    
+    container.innerHTML = pagamentos.map(p => `
+        <div class="activity-item">
+            <div class="activity-icon" style="background: rgba(46,204,113,0.1);">
+                <i class="fas fa-check" style="color: #2ecc71;"></i>
+            </div>
+            <div class="activity-info">
+                <strong>${p.cliente}</strong>
+                <small>Parcela ${p.parcela} - ${formatarData(p.data)}</small>
+            </div>
+            <div class="activity-value">${formatarMoeda(p.valor)}</div>
+        </div>
+    `).join('');
 }
 
-function formatarData(dataString) {
-    if (!dataString) return '-';
-    return new Date(dataString).toLocaleDateString('pt-BR');
+// ============================================
+// RELATÓRIOS
+// ============================================
+function carregarRelatorios() {
+    const clientes = Object.values(todosClientes);
+    
+    // Resumo
+    document.getElementById('relClientes').textContent = clientes.length;
+    document.getElementById('relRecebido').textContent = formatarMoeda(calcularTotalRecebido(clientes));
+    document.getElementById('relAberto').textContent = formatarMoeda(calcularTotalEmAberto(clientes));
+    document.getElementById('relInadimplencia').textContent = calcularTaxaInadimplencia(clientes).toFixed(1) + '%';
+    
+    // Gráficos
+    criarGraficoComparativoDias(clientes);
+    criarGraficoEvolucaoMensal(clientes);
+    carregarTopMarcas(clientes);
 }
 
-function formatarMes(mesAno) {
-    if (!mesAno) return '-';
-    const [ano, mes] = mesAno.split('-');
-    const nomeMes = new Date(ano, mes - 1).toLocaleDateString('pt-BR', { month: 'long' });
-    return `${nomeMes.toUpperCase()}/${ano}`;
-}
+function criarGraficoComparativoDias(clientes) {
+    const ctx = document.getElementById('chartComparativoDias').getContext('2d');
+    if (charts.comparativoDias) charts.comparativoDias.destroy();
+    
+    // Calcular dados...
+    const dados = calcularComparativoDias(clientes);
+    
+    charts.comparativoDias = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['Clientes', 'Recebido', 'Em Aberto',
