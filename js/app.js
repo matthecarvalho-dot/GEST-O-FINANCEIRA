@@ -297,4 +297,160 @@ function gerenciarParcelas(clienteId) {
                 <div>
                     <strong>Parcela ${parcela.numero}</strong><br>
                     <small>Vencimento: ${formatarData(parcela.vencimento)}</small><br>
-                    <small>Valor: R
+                    <small>Valor: R$ ${parcela.valor.toFixed(2)}</small>
+                </div>
+                <div>
+                    <select class="form-select custom-select mb-2" id="status_${clienteId}_${key}" style="width: 180px;">
+                        ${statusOptions}
+                    </select>
+                    <button class="btn-acao" onclick="atualizarStatusParcela('${clienteId}', '${key}')" style="width: 100%;">
+                        <i class="fas fa-check"></i> ATUALIZAR
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    modalParcelas.show();
+}
+
+async function atualizarStatusParcela(clienteId, parcelaKey) {
+    const selectId = `status_${clienteId}_${parcelaKey}`;
+    const novoStatus = document.getElementById(selectId).value;
+    const dataPagamento = novoStatus === 'pago' || novoStatus === 'quitado' 
+        ? new Date().toISOString() 
+        : null;
+    
+    try {
+        await clientesRef.child(`${clienteId}/parcelas/${parcelaKey}`).update({
+            status: novoStatus,
+            data_pagamento: dataPagamento
+        });
+        
+        console.log('✅ Status atualizado!');
+        gerenciarParcelas(clienteId); // Recarregar
+    } catch (error) {
+        console.error('Erro ao atualizar:', error);
+        alert('Erro ao atualizar status!');
+    }
+}
+
+// ============================================
+// FUNÇÕES AUXILIARES
+// ============================================
+
+function calcularStatusGeral(cliente) {
+    if (!cliente.parcelas) return 'pendente';
+    
+    const parcelas = Object.values(cliente.parcelas);
+    const total = parcelas.length;
+    const pagas = parcelas.filter(p => p.status === 'pago' || p.status === 'quitado').length;
+    const inadimplentes = parcelas.filter(p => p.status === 'inadimplente').length;
+    
+    if (pagas === total) return 'quitado';
+    if (inadimplentes > 0) return 'inadimplente';
+    if (pagas > 0) return 'finalizando';
+    if (parcelas.some(p => p.status === 'pago')) return 'pago';
+    return 'pendente';
+}
+
+function calcularValorEmAberto(cliente) {
+    if (!cliente.parcelas) return cliente.valor_total || 0;
+    
+    return Object.values(cliente.parcelas)
+        .filter(p => p.status !== 'pago' && p.status !== 'quitado')
+        .reduce((total, p) => total + p.valor, 0);
+}
+
+function contarParcelasPagas(cliente) {
+    if (!cliente.parcelas) return 0;
+    
+    return Object.values(cliente.parcelas)
+        .filter(p => p.status === 'pago' || p.status === 'quitado')
+        .length;
+}
+
+function atualizarContadores() {
+    const clientes = Object.values(todosClientes);
+    
+    const contadores = {
+        pago: 0,
+        quitado: 0,
+        finalizando: 0,
+        inadimplente: 0
+    };
+    
+    clientes.forEach(cliente => {
+        const status = calcularStatusGeral(cliente);
+        if (contadores[status] !== undefined) {
+            contadores[status]++;
+        }
+    });
+    
+    document.getElementById('countPago').textContent = contadores.pago;
+    document.getElementById('countQuitado').textContent = contadores.quitado;
+    document.getElementById('countFinalizando').textContent = contadores.finalizando;
+    document.getElementById('countInadimplente').textContent = contadores.inadimplente;
+}
+
+function filtrarPorStatus(status) {
+    document.getElementById('statusFiltro').value = status;
+    aplicarFiltros();
+}
+
+function limparFiltros() {
+    document.getElementById('mesFiltro').value = '';
+    document.getElementById('diaFiltro').value = '';
+    document.getElementById('statusFiltro').value = '';
+    aplicarFiltros();
+}
+
+function calcularParcela() {
+    const valorTotal = parseFloat(document.getElementById('valorTotal').value) || 0;
+    const qtdParcelas = parseInt(document.getElementById('qtdParcelas').value) || 1;
+    const valorParcela = valorTotal / qtdParcelas;
+    
+    document.getElementById('valorParcelaPreview').textContent = valorParcela.toFixed(2);
+}
+
+function carregarMeses() {
+    const select = document.getElementById('mesFiltro');
+    const dataAtual = new Date();
+    
+    for (let i = -6; i <= 6; i++) {
+        const data = new Date(dataAtual.getFullYear(), dataAtual.getMonth() + i, 1);
+        const valor = `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, '0')}`;
+        const nome = data.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+        
+        const option = document.createElement('option');
+        option.value = valor;
+        option.textContent = nome.toUpperCase();
+        select.appendChild(option);
+    }
+}
+
+function atualizarDataHora() {
+    const agora = new Date();
+    const formato = { 
+        weekday: 'long', 
+        day: 'numeric', 
+        month: 'long', 
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    };
+    document.getElementById('currentDateTime').textContent = 
+        agora.toLocaleDateString('pt-BR', formato);
+}
+
+function formatarData(dataString) {
+    if (!dataString) return '-';
+    return new Date(dataString).toLocaleDateString('pt-BR');
+}
+
+function formatarMes(mesAno) {
+    if (!mesAno) return '-';
+    const [ano, mes] = mesAno.split('-');
+    const nomeMes = new Date(ano, mes - 1).toLocaleDateString('pt-BR', { month: 'long' });
+    return `${nomeMes.toUpperCase()}/${ano}`;
+}
