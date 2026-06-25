@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KRONOS SYSTEM | Gestão Financeira</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#030712">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="KRONOS SYSTEM">
+    <link rel="apple-touch-icon" href="kronos_system.jpg">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -79,18 +85,18 @@
                 <div class="summary-card"><div class="summary-icon" style="background:rgba(245,158,11,0.1);"><i class="fas fa-percentage" style="color:#f59e0b;"></i></div><div class="summary-info"><span>Inadimplência</span><strong id="resumoInadimplencia">0%</strong></div></div>
             </div>
             <div class="charts-grid-modern">
-                <div class="chart-card-modern"><div class="chart-header"><h3><i class="fas fa-chart-line"></i> Fluxo de Pagamentos</h3></div><div class="chart-body"><canvas id="chartMensal"></canvas></div></div>
-                <div class="chart-card-modern"><div class="chart-header"><h3><i class="fas fa-chart-pie"></i> Status das Parcelas</h3></div><div class="chart-body"><canvas id="chartStatus"></canvas></div></div>
+                <div class="chart-card-modern"><div class="chart-header"><h3>Fluxo de Pagamentos</h3></div><div class="chart-body"><canvas id="chartMensal"></canvas></div></div>
+                <div class="chart-card-modern"><div class="chart-header"><h3>Status das Parcelas</h3></div><div class="chart-body"><canvas id="chartStatus"></canvas></div></div>
             </div>
-            <div class="chart-card-modern full-width"><div class="chart-header"><h3><i class="fas fa-balance-scale"></i> Comparativo Dias</h3></div><div class="chart-body"><canvas id="chartComparativo" height="200"></canvas></div></div>
+            <div class="chart-card-modern full-width"><div class="chart-header"><h3>Comparativo Dias</h3></div><div class="chart-body"><canvas id="chartComparativo" height="200"></canvas></div></div>
         </div>
 
         <!-- CLIENTES -->
         <div class="page-content" id="page-clientes"><div class="page-toolbar"><div class="toolbar-left"><input type="text" id="buscaCliente" placeholder="🔍 Buscar cliente..." onkeyup="carregarTabelaClientes()" class="search-input"><select id="filtroMesCliente" onchange="carregarTabelaClientes()" class="select-modern"><option value="">Todos os Meses</option></select></div><button class="btn-primary" onclick="abrirModalCliente()"><i class="fas fa-plus"></i> Novo Cliente</button></div><div class="table-modern"><table><thead><tr><th>Cliente</th><th>Marca</th><th>Vencimento</th><th>Valor Total</th><th>Parcelas</th><th>Em Aberto</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tabelaTodosClientes"></tbody></table></div></div>
-        <div class="page-content" id="page-dia5"><div class="page-toolbar"><h2><i class="fas fa-calendar-day"></i> Dia 5</h2><span class="count-badge" id="totalDia5">0</span></div><div class="table-modern"><table><thead><tr><th>Cliente</th><th>Marca</th><th>Mês</th><th>Valor Total</th><th>Parcelas</th><th>Em Aberto</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tabelaDia5"></tbody></table></div></div>
-        <div class="page-content" id="page-dia15"><div class="page-toolbar"><h2><i class="fas fa-calendar-alt"></i> Dia 15</h2><span class="count-badge" id="totalDia15">0</span></div><div class="table-modern"><table><thead><tr><th>Cliente</th><th>Marca</th><th>Mês</th><th>Valor Total</th><th>Parcelas</th><th>Em Aberto</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tabelaDia15"></tbody></table></div></div>
-        <div class="page-content" id="page-dia20"><div class="page-toolbar"><h2><i class="fas fa-calendar-check"></i> Dia 20</h2><span class="count-badge" id="totalDia20">0</span></div><div class="table-modern"><table><thead><tr><th>Cliente</th><th>Marca</th><th>Mês</th><th>Valor Total</th><th>Parcelas</th><th>Em Aberto</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tabelaDia20"></tbody></table></div></div>
-        <div class="page-content" id="page-dia30"><div class="page-toolbar"><h2><i class="fas fa-calendar"></i> Dia 30</h2><span class="count-badge" id="totalDia30">0</span></div><div class="table-modern"><table><thead><tr><th>Cliente</th><th>Marca</th><th>Mês</th><th>Valor Total</th><th>Parcelas</th><th>Em Aberto</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tabelaDia30"></tbody></table></div></div>
+        <div class="page-content" id="page-dia5"><div class="page-toolbar"><h2>Dia 5</h2><span class="count-badge" id="totalDia5">0</span></div><div class="table-modern"><table><thead><tr><th>Cliente</th><th>Marca</th><th>Mês</th><th>Valor Total</th><th>Parcelas</th><th>Em Aberto</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tabelaDia5"></tbody></table></div></div>
+        <div class="page-content" id="page-dia15"><div class="page-toolbar"><h2>Dia 15</h2><span class="count-badge" id="totalDia15">0</span></div><div class="table-modern"><table><thead><tr><th>Cliente</th><th>Marca</th><th>Mês</th><th>Valor Total</th><th>Parcelas</th><th>Em Aberto</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tabelaDia15"></tbody></table></div></div>
+        <div class="page-content" id="page-dia20"><div class="page-toolbar"><h2>Dia 20</h2><span class="count-badge" id="totalDia20">0</span></div><div class="table-modern"><table><thead><tr><th>Cliente</th><th>Marca</th><th>Mês</th><th>Valor Total</th><th>Parcelas</th><th>Em Aberto</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tabelaDia20"></tbody></table></div></div>
+        <div class="page-content" id="page-dia30"><div class="page-toolbar"><h2>Dia 30</h2><span class="count-badge" id="totalDia30">0</span></div><div class="table-modern"><table><thead><tr><th>Cliente</th><th>Marca</th><th>Mês</th><th>Valor Total</th><th>Parcelas</th><th>Em Aberto</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tabelaDia30"></tbody></table></div></div>
         <div class="page-content" id="page-parcelas"><div class="page-toolbar"><select id="filtroStatusParcela" onchange="carregarTodasParcelas()" class="select-modern"><option value="">Todos Status</option><option value="pendente">PENDENTE</option><option value="pagante">PAGANTE</option><option value="pago">PAGO</option><option value="quitado">QUITADO</option><option value="cancelado">CANCELADO</option><option value="inadimplente">INADIMPLENTE</option></select><select id="filtroDiaParcela" onchange="carregarTodasParcelas()" class="select-modern"><option value="">Todos Dias</option><option value="5">Dia 5</option><option value="15">Dia 15</option><option value="20">Dia 20</option><option value="30">Dia 30</option></select></div><div class="table-modern"><table><thead><tr><th>Cliente</th><th>Parcela</th><th>Valor</th><th>Vencimento</th><th>Status</th><th>Pagamento</th><th>Ação</th></tr></thead><tbody id="tabelaParcelas"></tbody></table></div></div>
         
         <!-- RELATÓRIOS -->
@@ -109,7 +115,7 @@
         <div class="page-content" id="page-admin"><div class="admin-grid"><div class="admin-card highlight"><div class="admin-card-header"><h3>MEU PERFIL</h3></div><div class="admin-card-body"><div class="profile-info"><div class="profile-avatar"><img src="kronos_system.jpg" style="width:100%;height:100%;object-fit:contain;border-radius:50%;" onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\'fas fa-crown\'></i>'"></div><div class="profile-details" id="meuPerfil"></div></div><button class="btn-primary" onclick="editarMeuPerfil()" style="margin-top:15px;width:100%;">EDITAR PERFIL</button></div></div><div class="admin-card"><div class="admin-card-header"><h3>FUNCIONÁRIOS</h3><button class="btn-primary" onclick="abrirModalUsuario()">Novo</button></div><div class="admin-card-body" id="listaUsuarios"></div></div></div></div>
         
         <!-- BACKUP -->
-        <div class="page-content" id="page-backup"><div class="backup-container"><div class="backup-card"><h2><i class="fas fa-download"></i> BACKUP</h2><p>Salve todos os dados.</p><button class="btn-primary" onclick="fazerBackup()" style="font-size:1rem;padding:14px 30px;">BAIXAR BACKUP</button></div><div class="backup-card"><h2><i class="fas fa-upload"></i> RESTAURAR</h2><p>Restaure um backup.</p><input type="file" id="arquivoBackup" accept=".json" class="input-full" style="margin-bottom:15px;"><button class="btn-primary" onclick="restaurarBackup()" style="font-size:1rem;padding:14px 30px;background:#ef4444;">RESTAURAR</button></div></div></div>
+        <div class="page-content" id="page-backup"><div class="backup-container"><div class="backup-card"><h2>BACKUP</h2><p>Salve todos os dados.</p><button class="btn-primary" onclick="fazerBackup()" style="font-size:1rem;padding:14px 30px;">BAIXAR BACKUP</button></div><div class="backup-card"><h2>RESTAURAR</h2><p>Restaure um backup.</p><input type="file" id="arquivoBackup" accept=".json" class="input-full" style="margin-bottom:15px;"><button class="btn-primary" onclick="restaurarBackup()" style="font-size:1rem;padding:14px 30px;background:#ef4444;">RESTAURAR</button></div></div></div>
     </main>
 </div>
 
@@ -120,9 +126,50 @@
 
 <div class="modal-overlay" id="modalUsuario" style="display:none;"><div class="modal-modern"><div class="modal-header"><h2 id="modalUsuarioTitulo">NOVO USUÁRIO</h2><button onclick="fecharModalUsuario()"><i class="fas fa-times"></i></button></div><div class="modal-body"><input type="hidden" id="editUserId"><div class="form-row"><div class="form-group"><label>NOME *</label><input type="text" id="usuarioNome" class="form-input"></div><div class="form-group"><label>CARGO</label><input type="text" id="usuarioCargo" class="form-input"></div></div><div class="form-row"><div class="form-group"><label>USUÁRIO *</label><input type="text" id="usuarioLogin" class="form-input"></div><div class="form-group"><label>SENHA *</label><input type="password" id="usuarioSenha" class="form-input"></div></div><div class="form-row"><div class="form-group"><label>NÍVEL</label><select id="usuarioNivel" class="form-input"><option value="admin">ADMIN</option><option value="gerente">GERENTE</option><option value="funcionario">FUNCIONÁRIO</option></select></div><div class="form-group"><label>STATUS</label><select id="usuarioAtivo" class="form-input"><option value="true">ATIVO</option><option value="false">INATIVO</option></select></div></div></div><div class="modal-footer"><button class="btn-cancel" onclick="fecharModalUsuario()">CANCELAR</button><button class="btn-primary" onclick="salvarUsuario()">SALVAR</button></div></div></div>
 
+<!-- BOTÃO INSTALAR APP -->
+<div id="installBanner" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9999;background:linear-gradient(135deg,#0a1628,#0f1f35);border:2px solid #c9a84c;border-radius:16px;padding:15px 25px;box-shadow:0 10px 40px rgba(0,0,0,0.8);align-items:center;gap:15px;font-family:'Segoe UI',sans-serif;">
+    <span style="font-size:2rem;">📥</span>
+    <div>
+        <strong style="color:#c9a84c;display:block;">KRONOS SYSTEM</strong>
+        <small style="color:#8899aa;">Instalar como aplicativo</small>
+    </div>
+    <button onclick="instalarApp()" style="padding:10px 20px;background:#c9a84c;color:#0a1628;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:0.85rem;letter-spacing:1px;white-space:nowrap;">INSTALAR</button>
+    <button onclick="document.getElementById('installBanner').style.display='none'" style="background:none;border:none;color:#8899aa;cursor:pointer;font-size:1.2rem;">&times;</button>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="script.js"></script>
+
+<script>
+// Instalar como App
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('installBanner').style.display = 'flex';
+});
+
+function instalarApp() {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((result) => {
+            if (result.outcome === 'accepted') console.log('✅ App instalado!');
+            deferredPrompt = null;
+            document.getElementById('installBanner').style.display = 'none';
+        });
+    } else {
+        alert('📥 Para instalar:\n\n• Chrome: Menu → Criar atalho → "Abrir como janela"\n• Edge: Menu → Aplicativos → Instalar');
+    }
+}
+
+setTimeout(() => {
+    if (!deferredPrompt && !window.matchMedia('(display-mode: standalone)').matches) {
+        document.getElementById('installBanner').style.display = 'flex';
+    }
+}, 3000);
+</script>
+
 </body>
 </html>
