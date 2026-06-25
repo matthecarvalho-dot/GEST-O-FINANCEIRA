@@ -1,0 +1,21 @@
+{
+    "name": "KRONOS SYSTEM - Gestão Financeira",
+    "short_name": "KRONOS",
+    "description": "Sistema Executivo de Gestão Financeira",
+    "start_url": "/GEST-O-FINANCEIRA/",
+    "display": "standalone",
+    "background_color": "#030712",
+    "theme_color": "#c9a84c",
+    "icons": [
+        {
+            "src": "kronos_system.jpg",
+            "sizes": "192x192",
+            "type": "image/jpeg"
+        },
+        {
+            "src": "kronos_system.jpg",
+            "sizes": "512x512",
+            "type": "image/jpeg"
+        }
+    ]
+}
