@@ -5,122 +5,124 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KRONOS SYSTEM | Gestão Financeira</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
-        .brand-logo-img{width:100%;height:100%;object-fit:contain;border-radius:16px;transition:0.3s;}
-        .sidebar-logo-img{width:44px;height:44px;object-fit:contain;border-radius:10px;}
-        .login-link{text-align:center;margin-top:18px;color:#94a3b8;font-size:0.82rem;cursor:pointer;transition:0.3s;}
-        .login-link strong{color:#e2b94b;font-weight:600;}
-        .login-link:hover strong{color:#f0d070;text-decoration:underline;}
-        .relatorio-resumo{margin-bottom:20px;}
+        .brand-logo-img{width:100%;height:100%;object-fit:contain;border-radius:16px;}.sidebar-logo-img{width:44px;height:44px;object-fit:contain;border-radius:10px;}.login-link{text-align:center;margin-top:18px;color:#94a3b8;font-size:0.82rem;cursor:pointer;}.login-link strong{color:#e2b94b;}.login-link:hover strong{color:#f0d070;}
     </style>
 </head>
 <body>
-    <div class="login-container" id="loginScreen">
-        <div class="login-card">
-            <div class="login-brand">
-                <div class="brand-icon">
-                    <img src="kronos_system.jpg" alt="KRONOS" class="brand-logo-img" onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\'fas fa-crown\'></i>'">
-                </div>
-                <h1>KRONOS SYSTEM</h1>
-                <p>GESTÃO FINANCEIRA · EXECUTIVA</p>
-            </div>
-            <div id="formLogin">
-                <div class="field-group"><i class="fas fa-user"></i><input type="text" id="loginUser" placeholder="Usuário"></div>
-                <div class="field-group"><i class="fas fa-lock"></i><input type="password" id="loginPass" placeholder="Senha"></div>
-                <button class="btn-login" onclick="fazerLogin()"><span>ACESSAR SISTEMA</span><i class="fas fa-arrow-right"></i></button>
-                <p class="login-link" onclick="mostrarCriarConta()">Não tem conta? <strong>Criar perfil</strong></p>
-            </div>
-            <div id="formCriarConta" style="display:none;">
-                <div class="field-group"><i class="fas fa-user"></i><input type="text" id="novoNome" placeholder="Nome completo"></div>
-                <div class="field-group"><i class="fas fa-briefcase"></i><input type="text" id="novoCargo" placeholder="Seu cargo"></div>
-                <div class="field-group"><i class="fas fa-at"></i><input type="text" id="novoUsuario" placeholder="Nome de usuário"></div>
-                <div class="field-group"><i class="fas fa-lock"></i><input type="password" id="novaSenha" placeholder="Criar senha"></div>
-                <div class="field-group"><i class="fas fa-lock"></i><input type="password" id="novaSenhaConf" placeholder="Confirmar senha"></div>
-                <button class="btn-login" onclick="criarConta()"><span>CRIAR PERFIL</span><i class="fas fa-user-plus"></i></button>
-                <p class="login-link" onclick="mostrarLogin()">Já tem conta? <strong>Fazer login</strong></p>
-            </div>
+
+<!-- LOGIN -->
+<div class="login-container" id="loginScreen">
+    <div class="login-card">
+        <div class="login-brand">
+            <div class="brand-icon"><img src="kronos_system.jpg" alt="KRONOS" class="brand-logo-img" onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\'fas fa-crown\'></i>'"></div>
+            <h1>KRONOS SYSTEM</h1><p>GESTÃO FINANCEIRA EXECUTIVA</p>
+        </div>
+        <div id="formLogin">
+            <div class="field-group"><i class="fas fa-user"></i><input type="text" id="loginUser" placeholder="Usuário"></div>
+            <div class="field-group"><i class="fas fa-lock"></i><input type="password" id="loginPass" placeholder="Senha"></div>
+            <button class="btn-login" onclick="fazerLogin()"><span>ACESSAR SISTEMA</span><i class="fas fa-arrow-right"></i></button>
+            <p class="login-link" onclick="mostrarCriarConta()">Não tem conta? <strong>Criar perfil</strong></p>
+        </div>
+        <div id="formCriarConta" style="display:none;">
+            <div class="field-group"><i class="fas fa-user"></i><input type="text" id="novoNome" placeholder="Nome completo"></div>
+            <div class="field-group"><i class="fas fa-briefcase"></i><input type="text" id="novoCargo" placeholder="Seu cargo"></div>
+            <div class="field-group"><i class="fas fa-at"></i><input type="text" id="novoUsuario" placeholder="Nome de usuário"></div>
+            <div class="field-group"><i class="fas fa-lock"></i><input type="password" id="novaSenha" placeholder="Criar senha"></div>
+            <div class="field-group"><i class="fas fa-lock"></i><input type="password" id="novaSenhaConf" placeholder="Confirmar senha"></div>
+            <button class="btn-login" onclick="criarConta()"><span>CRIAR PERFIL</span><i class="fas fa-user-plus"></i></button>
+            <p class="login-link" onclick="mostrarLogin()">Já tem conta? <strong>Fazer login</strong></p>
         </div>
     </div>
-    <div class="app-layout" id="mainSystem" style="display:none;">
-        <aside class="sidebar-modern">
-            <div class="sidebar-brand">
-                <img src="kronos_system.jpg" alt="KRONOS" class="sidebar-logo-img" onerror="this.style.display='none';this.insertAdjacentHTML('beforebegin','<i class=\'fas fa-chart-line\' style=\'font-size:1.8rem;color:#c9a84c;\'></i>')">
-                <div><h2>KRONOS</h2><span>SYSTEM</span></div>
-            </div>
-            <nav class="sidebar-menu">
-                <div class="menu-section"><span class="menu-label">PRINCIPAL</span><a href="#" class="menu-item active" data-page="dashboard"><i class="fas fa-th-large"></i><span>Dashboard</span></a></div>
-                <div class="menu-section"><span class="menu-label">CLIENTES</span>
-                    <a href="#" class="menu-item" data-page="clientes"><i class="fas fa-users"></i><span>Todos os Clientes</span></a>
-                    <a href="#" class="menu-item" data-page="dia5"><i class="fas fa-calendar-day"></i><span>Dia 5</span><span class="menu-badge" id="badgeDia5">0</span></a>
-                    <a href="#" class="menu-item" data-page="dia15"><i class="fas fa-calendar-alt"></i><span>Dia 15</span><span class="menu-badge" id="badgeDia15">0</span></a>
-                    <a href="#" class="menu-item" data-page="dia20"><i class="fas fa-calendar-check"></i><span>Dia 20</span><span class="menu-badge" id="badgeDia20">0</span></a>
-                    <a href="#" class="menu-item" data-page="dia30"><i class="fas fa-calendar"></i><span>Dia 30</span><span class="menu-badge" id="badgeDia30">0</span></a>
-                </div>
-                <div class="menu-section"><span class="menu-label">FINANCEIRO</span>
-                    <a href="#" class="menu-item" data-page="parcelas"><i class="fas fa-file-invoice"></i><span>Todas as Parcelas</span></a>
-                    <a href="#" class="menu-item" data-page="relatorios"><i class="fas fa-chart-bar"></i><span>Relatórios</span></a>
-                </div>
-                <div class="menu-section"><span class="menu-label">ADMINISTRAÇÃO</span>
-                    <a href="#" class="menu-item" data-page="admin"><i class="fas fa-shield-alt"></i><span>Usuários</span></a>
-                    <a href="#" class="menu-item" data-page="backup"><i class="fas fa-database"></i><span>Backup</span></a>
-                </div>
-            </nav>
-            <div class="sidebar-user"><div class="user-avatar"><i class="fas fa-user-circle"></i></div><div class="user-info"><strong id="sidebarUserName">Admin</strong><small id="sidebarUserCargo">Gerente</small></div><button class="btn-logout-mini" onclick="sair()"><i class="fas fa-sign-out-alt"></i></button></div>
-        </aside>
-        <main class="content-main">
-            <header class="topbar-modern"><div class="topbar-left"><h1 id="pageTitle">Dashboard Executivo</h1><div class="breadcrumb"><span>Home</span><i class="fas fa-chevron-right"></i><span class="active">Dashboard</span></div></div><div class="topbar-right"><div class="topbar-date"><i class="far fa-calendar-alt"></i><span id="currentDateTime"></span></div><div class="topbar-stat"><i class="fas fa-building"></i><span id="totalClientesTop">0 clientes</span></div></div></header>
-            
-            <div class="page-content active" id="page-dashboard">
-                <div class="kpi-grid-modern">
-                    <div class="kpi-card-modern"><div class="kpi-icon-wrap" style="background:linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.05));"><i class="fas fa-check-circle" style="color:#10b981;"></i></div><div class="kpi-details"><span class="kpi-label">PAGO</span><h3 class="kpi-value" id="kpiPago">0</h3></div></div>
-                    <div class="kpi-card-modern"><div class="kpi-icon-wrap" style="background:linear-gradient(135deg, rgba(226,185,75,0.2), rgba(226,185,75,0.05));"><i class="fas fa-star" style="color:#e2b94b;"></i></div><div class="kpi-details"><span class="kpi-label">QUITADO</span><h3 class="kpi-value" id="kpiQuitado">0</h3></div></div>
-                    <div class="kpi-card-modern"><div class="kpi-icon-wrap" style="background:linear-gradient(135deg, rgba(245,158,11,0.2), rgba(245,158,11,0.05));"><i class="fas fa-spinner" style="color:#f59e0b;"></i></div><div class="kpi-details"><span class="kpi-label">FINALIZANDO</span><h3 class="kpi-value" id="kpiFinalizando">0</h3></div></div>
-                    <div class="kpi-card-modern"><div class="kpi-icon-wrap" style="background:linear-gradient(135deg, rgba(239,68,68,0.2), rgba(239,68,68,0.05));"><i class="fas fa-exclamation-triangle" style="color:#ef4444;"></i></div><div class="kpi-details"><span class="kpi-label">INADIMPLENTE</span><h3 class="kpi-value" id="kpiInadimplente">0</h3></div></div>
-                </div>
-                <div class="summary-grid">
-                    <div class="summary-card"><div class="summary-icon" style="background:rgba(16,185,129,0.1);"><i class="fas fa-dollar-sign" style="color:#10b981;"></i></div><div class="summary-info"><span>Total Recebido</span><strong id="resumoRecebido">R$ 0,00</strong></div></div>
-                    <div class="summary-card"><div class="summary-icon" style="background:rgba(239,68,68,0.1);"><i class="fas fa-clock" style="color:#ef4444;"></i></div><div class="summary-info"><span>Em Aberto</span><strong id="resumoAberto">R$ 0,00</strong></div></div>
-                    <div class="summary-card"><div class="summary-icon" style="background:rgba(245,158,11,0.1);"><i class="fas fa-percentage" style="color:#f59e0b;"></i></div><div class="summary-info"><span>Inadimplência</span><strong id="resumoInadimplencia">0%</strong></div></div>
-                </div>
-                <div class="charts-grid-modern">
-                    <div class="chart-card-modern"><div class="chart-header"><h3><i class="fas fa-chart-line"></i> Fluxo de Pagamentos</h3></div><div class="chart-body"><canvas id="chartMensal"></canvas></div></div>
-                    <div class="chart-card-modern"><div class="chart-header"><h3><i class="fas fa-chart-pie"></i> Status das Parcelas</h3></div><div class="chart-body"><canvas id="chartStatus"></canvas></div></div>
-                </div>
-                <div class="chart-card-modern full-width"><div class="chart-header"><h3><i class="fas fa-balance-scale"></i> Comparativo Dias 5, 15, 20, 30</h3></div><div class="chart-body"><canvas id="chartComparativo" height="200"></canvas></div></div>
-            </div>
+</div>
 
-            <div class="page-content" id="page-clientes"><div class="page-toolbar"><div class="toolbar-left"><input type="text" id="buscaCliente" placeholder="🔍 Buscar cliente..." onkeyup="carregarTabelaClientes()" class="search-input"><select id="filtroMesCliente" onchange="carregarTabelaClientes()" class="select-modern"><option value="">Todos os Meses</option></select></div><button class="btn-primary" onclick="abrirModalCliente()"><i class="fas fa-plus"></i> Novo Cliente</button></div><div class="table-modern"><table><thead><tr><th>Cliente</th><th>Marca</th><th>Vencimento</th><th>Valor Total</th><th>Parcelas</th><th>Em Aberto</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tabelaTodosClientes"></tbody></table></div></div>
-            <div class="page-content" id="page-dia5"><div class="page-toolbar"><h2><i class="fas fa-calendar-day"></i> Dia 5</h2><span class="count-badge" id="totalDia5">0</span></div><div class="table-modern"><table><thead><tr><th>Cliente</th><th>Marca</th><th>Mês</th><th>Valor Total</th><th>Parcelas</th><th>Em Aberto</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tabelaDia5"></tbody></table></div></div>
-            <div class="page-content" id="page-dia15"><div class="page-toolbar"><h2><i class="fas fa-calendar-alt"></i> Dia 15</h2><span class="count-badge" id="totalDia15">0</span></div><div class="table-modern"><table><thead><tr><th>Cliente</th><th>Marca</th><th>Mês</th><th>Valor Total</th><th>Parcelas</th><th>Em Aberto</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tabelaDia15"></tbody></table></div></div>
-            <div class="page-content" id="page-dia20"><div class="page-toolbar"><h2><i class="fas fa-calendar-check"></i> Dia 20</h2><span class="count-badge" id="totalDia20">0</span></div><div class="table-modern"><table><thead><tr><th>Cliente</th><th>Marca</th><th>Mês</th><th>Valor Total</th><th>Parcelas</th><th>Em Aberto</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tabelaDia20"></tbody></table></div></div>
-            <div class="page-content" id="page-dia30"><div class="page-toolbar"><h2><i class="fas fa-calendar"></i> Dia 30</h2><span class="count-badge" id="totalDia30">0</span></div><div class="table-modern"><table><thead><tr><th>Cliente</th><th>Marca</th><th>Mês</th><th>Valor Total</th><th>Parcelas</th><th>Em Aberto</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tabelaDia30"></tbody></table></div></div>
-            <div class="page-content" id="page-parcelas"><div class="page-toolbar"><select id="filtroStatusParcela" onchange="carregarTodasParcelas()" class="select-modern"><option value="">Todos Status</option><option value="pago">Pago</option><option value="quitado">Quitado</option><option value="finalizando">Finalizando</option><option value="inadimplente">Inadimplente</option><option value="pendente">Pendente</option></select><select id="filtroDiaParcela" onchange="carregarTodasParcelas()" class="select-modern"><option value="">Todos Dias</option><option value="5">Dia 5</option><option value="15">Dia 15</option><option value="20">Dia 20</option><option value="30">Dia 30</option></select></div><div class="table-modern"><table><thead><tr><th>Cliente</th><th>Parcela</th><th>Valor</th><th>Vencimento</th><th>Status</th><th>Pagamento</th><th>Ação</th></tr></thead><tbody id="tabelaParcelas"></tbody></table></div></div>
-            <div class="page-content" id="page-relatorios">
-                <div class="reports-grid">
-                    <div class="report-card"><h3>Resumo Geral</h3><div class="report-row"><span>Clientes</span><strong id="relClientes">0</strong></div><div class="report-row"><span>Recebido</span><strong id="relRecebido">R$ 0</strong></div><div class="report-row"><span>Em Aberto</span><strong id="relAberto">R$ 0</strong></div><div class="report-row"><span>Inadimplência</span><strong id="relInadimplencia">0%</strong></div></div>
-                    <div class="report-card"><h3>Dia 5</h3><div class="report-row"><span>Clientes</span><strong id="relDia5Cli">0</strong></div><div class="report-row"><span>Recebido</span><strong id="relDia5Rec">R$ 0</strong></div><div class="report-row"><span>Em Aberto</span><strong id="relDia5Ab">R$ 0</strong></div></div>
-                    <div class="report-card"><h3>Dia 15</h3><div class="report-row"><span>Clientes</span><strong id="relDia15Cli">0</strong></div><div class="report-row"><span>Recebido</span><strong id="relDia15Rec">R$ 0</strong></div><div class="report-row"><span>Em Aberto</span><strong id="relDia15Ab">R$ 0</strong></div></div>
-                    <div class="report-card"><h3>Dia 20</h3><div class="report-row"><span>Clientes</span><strong id="relDia20Cli">0</strong></div><div class="report-row"><span>Recebido</span><strong id="relDia20Rec">R$ 0</strong></div><div class="report-row"><span>Em Aberto</span><strong id="relDia20Ab">R$ 0</strong></div></div>
-                    <div class="report-card"><h3>Dia 30</h3><div class="report-row"><span>Clientes</span><strong id="relDia30Cli">0</strong></div><div class="report-row"><span>Recebido</span><strong id="relDia30Rec">R$ 0</strong></div><div class="report-row"><span>Em Aberto</span><strong id="relDia30Ab">R$ 0</strong></div></div>
-                </div>
-                <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:25px;margin-top:20px;" id="relatorioDetalhado">
-                    <p style="text-align:center;color:#94a3b8;">Selecione um tipo de relatório</p>
-                </div>
+<!-- SISTEMA -->
+<div class="app-layout" id="mainSystem" style="display:none;">
+    <aside class="sidebar-modern">
+        <div class="sidebar-brand"><img src="kronos_system.jpg" alt="KRONOS" class="sidebar-logo-img" onerror="this.style.display='none';this.insertAdjacentHTML('beforebegin','<i class=\'fas fa-chart-line\' style=\'font-size:1.8rem;color:#c9a84c;\'></i>')"><div><h2>KRONOS</h2><span>SYSTEM</span></div></div>
+        <nav class="sidebar-menu">
+            <div class="menu-section"><span class="menu-label">PRINCIPAL</span><a href="#" class="menu-item active" data-page="dashboard"><i class="fas fa-th-large"></i><span>Dashboard</span></a></div>
+            <div class="menu-section"><span class="menu-label">CLIENTES</span>
+                <a href="#" class="menu-item" data-page="clientes"><i class="fas fa-users"></i><span>Todos os Clientes</span></a>
+                <a href="#" class="menu-item" data-page="dia5"><i class="fas fa-calendar-day"></i><span>Dia 5</span><span class="menu-badge" id="badgeDia5">0</span></a>
+                <a href="#" class="menu-item" data-page="dia15"><i class="fas fa-calendar-alt"></i><span>Dia 15</span><span class="menu-badge" id="badgeDia15">0</span></a>
+                <a href="#" class="menu-item" data-page="dia20"><i class="fas fa-calendar-check"></i><span>Dia 20</span><span class="menu-badge" id="badgeDia20">0</span></a>
+                <a href="#" class="menu-item" data-page="dia30"><i class="fas fa-calendar"></i><span>Dia 30</span><span class="menu-badge" id="badgeDia30">0</span></a>
             </div>
-            <div class="page-content" id="page-admin"><div class="admin-grid"><div class="admin-card highlight"><div class="admin-card-header"><h3>MEU PERFIL</h3></div><div class="admin-card-body"><div class="profile-info"><div class="profile-avatar"><img src="kronos_system.jpg" style="width:100%;height:100%;object-fit:contain;border-radius:50%;" onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\'fas fa-crown\'></i>'"></div><div class="profile-details" id="meuPerfil"></div></div><button class="btn-primary" onclick="editarMeuPerfil()" style="margin-top:15px;width:100%;">EDITAR PERFIL</button></div></div><div class="admin-card"><div class="admin-card-header"><h3>FUNCIONÁRIOS</h3><button class="btn-primary" onclick="abrirModalUsuario()">Novo</button></div><div class="admin-card-body" id="listaUsuarios"></div></div></div></div>
-            <div class="page-content" id="page-backup"><div class="backup-container"><div class="backup-card"><h2><i class="fas fa-download"></i> BACKUP</h2><p>Salve todos os dados do sistema.</p><button class="btn-primary" onclick="fazerBackup()" style="font-size:1rem;padding:14px 30px;">BAIXAR BACKUP</button></div><div class="backup-card"><h2><i class="fas fa-upload"></i> RESTAURAR</h2><p>Restaure dados de um arquivo.</p><input type="file" id="arquivoBackup" accept=".json" class="input-full" style="margin-bottom:15px;"><button class="btn-primary" onclick="restaurarBackup()" style="font-size:1rem;padding:14px 30px;background:#ef4444;">RESTAURAR</button></div></div></div>
-        </main>
-    </div>
-    <div class="modal-overlay" id="modalCliente" style="display:none;"><div class="modal-modern"><div class="modal-header"><h2 id="modalTitulo">NOVO CLIENTE</h2><button onclick="fecharModalCliente()"><i class="fas fa-times"></i></button></div><div class="modal-body"><input type="hidden" id="editId"><div class="form-row"><div class="form-group"><label>NOME *</label><input type="text" id="nomeCliente" class="form-input"></div><div class="form-group"><label>MARCA *</label><input type="text" id="marcaCliente" class="form-input"></div></div><div class="form-row"><div class="form-group"><label>VALOR TOTAL *</label><input type="number" id="valorTotal" class="form-input" step="0.01" onkeyup="calcParcela()"></div><div class="form-group"><label>TOTAL PARCELAS *</label><input type="number" id="qtdParcelas" class="form-input" min="1" value="1" onkeyup="calcParcela()"></div></div><div class="form-row"><div class="form-group"><label>DIA VENCIMENTO *</label><select id="diaVencimento" class="form-input"><option value="5">DIA 5</option><option value="15">DIA 15</option><option value="20">DIA 20</option><option value="30">DIA 30</option></select></div><div class="form-group"><label>MÊS REFERÊNCIA *</label><input type="month" id="mesReferencia" class="form-input"></div></div><div class="preview-box">💰 <strong id="previewParcela">R$ 0,00</strong> por parcela | <span id="previewParcelas"></span></div></div><div class="modal-footer"><button class="btn-cancel" onclick="fecharModalCliente()">CANCELAR</button><button class="btn-primary" onclick="salvarCliente()">SALVAR</button></div></div></div>
-    <div class="modal-overlay" id="modalParcela" style="display:none;"><div class="modal-modern modal-sm"><div class="modal-header"><h2>ATUALIZAR PARCELA</h2><button onclick="fecharModalParcela()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p id="infoParcela"></p><div class="form-group"><label>STATUS</label><select id="novoStatus" class="form-input"><option value="pendente">PENDENTE</option><option value="pago">PAGO</option><option value="quitado">QUITADO</option><option value="finalizando">FINALIZANDO</option><option value="inadimplente">INADIMPLENTE</option></select></div><input type="hidden" id="parcelaClienteId"><input type="hidden" id="parcelaKey"></div><div class="modal-footer"><button class="btn-cancel" onclick="fecharModalParcela()">CANCELAR</button><button class="btn-primary" onclick="atualizarStatusParcela()">ATUALIZAR</button></div></div></div>
-    <div class="modal-overlay" id="modalUsuario" style="display:none;"><div class="modal-modern"><div class="modal-header"><h2 id="modalUsuarioTitulo">NOVO USUÁRIO</h2><button onclick="fecharModalUsuario()"><i class="fas fa-times"></i></button></div><div class="modal-body"><input type="hidden" id="editUserId"><div class="form-row"><div class="form-group"><label>NOME *</label><input type="text" id="usuarioNome" class="form-input"></div><div class="form-group"><label>CARGO</label><input type="text" id="usuarioCargo" class="form-input"></div></div><div class="form-row"><div class="form-group"><label>USUÁRIO *</label><input type="text" id="usuarioLogin" class="form-input"></div><div class="form-group"><label>SENHA *</label><input type="password" id="usuarioSenha" class="form-input"></div></div><div class="form-row"><div class="form-group"><label>NÍVEL</label><select id="usuarioNivel" class="form-input"><option value="admin">ADMIN</option><option value="gerente">GERENTE</option><option value="funcionario">FUNCIONÁRIO</option></select></div><div class="form-group"><label>STATUS</label><select id="usuarioAtivo" class="form-input"><option value="true">ATIVO</option><option value="false">INATIVO</option></select></div></div></div><div class="modal-footer"><button class="btn-cancel" onclick="fecharModalUsuario()">CANCELAR</button><button class="btn-primary" onclick="salvarUsuario()">SALVAR</button></div></div></div>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="script.js"></script>
+            <div class="menu-section"><span class="menu-label">FINANCEIRO</span>
+                <a href="#" class="menu-item" data-page="parcelas"><i class="fas fa-file-invoice"></i><span>Todas as Parcelas</span></a>
+                <a href="#" class="menu-item" data-page="relatorios"><i class="fas fa-chart-bar"></i><span>Relatórios</span></a>
+            </div>
+            <div class="menu-section"><span class="menu-label">ADMIN</span>
+                <a href="#" class="menu-item" data-page="admin"><i class="fas fa-shield-alt"></i><span>Usuários</span></a>
+                <a href="#" class="menu-item" data-page="backup"><i class="fas fa-database"></i><span>Backup</span></a>
+            </div>
+        </nav>
+        <div class="sidebar-user"><div class="user-avatar"><i class="fas fa-user-circle"></i></div><div class="user-info"><strong id="sidebarUserName">Admin</strong><small id="sidebarUserCargo">Gerente</small></div><button class="btn-logout-mini" onclick="sair()"><i class="fas fa-sign-out-alt"></i></button></div>
+    </aside>
+    <main class="content-main">
+        <header class="topbar-modern"><div class="topbar-left"><h1 id="pageTitle">Dashboard</h1><div class="breadcrumb"><span>Home</span><i class="fas fa-chevron-right"></i><span class="active">Dashboard</span></div></div><div class="topbar-right"><div class="topbar-date"><i class="far fa-calendar-alt"></i><span id="currentDateTime"></span></div><div class="topbar-stat"><i class="fas fa-building"></i><span id="totalClientesTop">0 clientes</span></div></div></header>
+        
+        <!-- DASHBOARD -->
+        <div class="page-content active" id="page-dashboard">
+            <div class="kpi-grid-modern">
+                <div class="kpi-card-modern"><div class="kpi-icon-wrap" style="background:rgba(16,185,129,0.15);"><i class="fas fa-check-circle" style="color:#10b981;"></i></div><div class="kpi-details"><span class="kpi-label">PAGO</span><h3 class="kpi-value" id="kpiPago">0</h3></div></div>
+                <div class="kpi-card-modern"><div class="kpi-icon-wrap" style="background:rgba(226,185,75,0.15);"><i class="fas fa-star" style="color:#e2b94b;"></i></div><div class="kpi-details"><span class="kpi-label">QUITADO</span><h3 class="kpi-value" id="kpiQuitado">0</h3></div></div>
+                <div class="kpi-card-modern"><div class="kpi-icon-wrap" style="background:rgba(59,130,246,0.15);"><i class="fas fa-spinner" style="color:#3b82f6;"></i></div><div class="kpi-details"><span class="kpi-label">PAGANTE</span><h3 class="kpi-value" id="kpiFinalizando">0</h3></div></div>
+                <div class="kpi-card-modern"><div class="kpi-icon-wrap" style="background:rgba(239,68,68,0.15);"><i class="fas fa-exclamation-triangle" style="color:#ef4444;"></i></div><div class="kpi-details"><span class="kpi-label">INADIMPLENTE</span><h3 class="kpi-value" id="kpiInadimplente">0</h3></div></div>
+            </div>
+            <div class="summary-grid">
+                <div class="summary-card"><div class="summary-icon" style="background:rgba(16,185,129,0.1);"><i class="fas fa-dollar-sign" style="color:#10b981;"></i></div><div class="summary-info"><span>Total Recebido</span><strong id="resumoRecebido">R$ 0,00</strong></div></div>
+                <div class="summary-card"><div class="summary-icon" style="background:rgba(239,68,68,0.1);"><i class="fas fa-clock" style="color:#ef4444;"></i></div><div class="summary-info"><span>Em Aberto</span><strong id="resumoAberto">R$ 0,00</strong></div></div>
+                <div class="summary-card"><div class="summary-icon" style="background:rgba(245,158,11,0.1);"><i class="fas fa-percentage" style="color:#f59e0b;"></i></div><div class="summary-info"><span>Inadimplência</span><strong id="resumoInadimplencia">0%</strong></div></div>
+            </div>
+            <div class="charts-grid-modern">
+                <div class="chart-card-modern"><div class="chart-header"><h3><i class="fas fa-chart-line"></i> Fluxo de Pagamentos</h3></div><div class="chart-body"><canvas id="chartMensal"></canvas></div></div>
+                <div class="chart-card-modern"><div class="chart-header"><h3><i class="fas fa-chart-pie"></i> Status das Parcelas</h3></div><div class="chart-body"><canvas id="chartStatus"></canvas></div></div>
+            </div>
+            <div class="chart-card-modern full-width"><div class="chart-header"><h3><i class="fas fa-balance-scale"></i> Comparativo Dias</h3></div><div class="chart-body"><canvas id="chartComparativo" height="200"></canvas></div></div>
+        </div>
+
+        <!-- CLIENTES -->
+        <div class="page-content" id="page-clientes"><div class="page-toolbar"><div class="toolbar-left"><input type="text" id="buscaCliente" placeholder="🔍 Buscar cliente..." onkeyup="carregarTabelaClientes()" class="search-input"><select id="filtroMesCliente" onchange="carregarTabelaClientes()" class="select-modern"><option value="">Todos os Meses</option></select></div><button class="btn-primary" onclick="abrirModalCliente()"><i class="fas fa-plus"></i> Novo Cliente</button></div><div class="table-modern"><table><thead><tr><th>Cliente</th><th>Marca</th><th>Vencimento</th><th>Valor Total</th><th>Parcelas</th><th>Em Aberto</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tabelaTodosClientes"></tbody></table></div></div>
+        <div class="page-content" id="page-dia5"><div class="page-toolbar"><h2><i class="fas fa-calendar-day"></i> Dia 5</h2><span class="count-badge" id="totalDia5">0</span></div><div class="table-modern"><table><thead><tr><th>Cliente</th><th>Marca</th><th>Mês</th><th>Valor Total</th><th>Parcelas</th><th>Em Aberto</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tabelaDia5"></tbody></table></div></div>
+        <div class="page-content" id="page-dia15"><div class="page-toolbar"><h2><i class="fas fa-calendar-alt"></i> Dia 15</h2><span class="count-badge" id="totalDia15">0</span></div><div class="table-modern"><table><thead><tr><th>Cliente</th><th>Marca</th><th>Mês</th><th>Valor Total</th><th>Parcelas</th><th>Em Aberto</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tabelaDia15"></tbody></table></div></div>
+        <div class="page-content" id="page-dia20"><div class="page-toolbar"><h2><i class="fas fa-calendar-check"></i> Dia 20</h2><span class="count-badge" id="totalDia20">0</span></div><div class="table-modern"><table><thead><tr><th>Cliente</th><th>Marca</th><th>Mês</th><th>Valor Total</th><th>Parcelas</th><th>Em Aberto</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tabelaDia20"></tbody></table></div></div>
+        <div class="page-content" id="page-dia30"><div class="page-toolbar"><h2><i class="fas fa-calendar"></i> Dia 30</h2><span class="count-badge" id="totalDia30">0</span></div><div class="table-modern"><table><thead><tr><th>Cliente</th><th>Marca</th><th>Mês</th><th>Valor Total</th><th>Parcelas</th><th>Em Aberto</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tabelaDia30"></tbody></table></div></div>
+        <div class="page-content" id="page-parcelas"><div class="page-toolbar"><select id="filtroStatusParcela" onchange="carregarTodasParcelas()" class="select-modern"><option value="">Todos Status</option><option value="pendente">PENDENTE</option><option value="pagante">PAGANTE</option><option value="pago">PAGO</option><option value="quitado">QUITADO</option><option value="cancelado">CANCELADO</option><option value="inadimplente">INADIMPLENTE</option></select><select id="filtroDiaParcela" onchange="carregarTodasParcelas()" class="select-modern"><option value="">Todos Dias</option><option value="5">Dia 5</option><option value="15">Dia 15</option><option value="20">Dia 20</option><option value="30">Dia 30</option></select></div><div class="table-modern"><table><thead><tr><th>Cliente</th><th>Parcela</th><th>Valor</th><th>Vencimento</th><th>Status</th><th>Pagamento</th><th>Ação</th></tr></thead><tbody id="tabelaParcelas"></tbody></table></div></div>
+        
+        <!-- RELATÓRIOS -->
+        <div class="page-content" id="page-relatorios">
+            <div class="reports-grid">
+                <div class="report-card"><h3>Resumo Geral</h3><div class="report-row"><span>Clientes</span><strong id="relClientes">0</strong></div><div class="report-row"><span>Recebido</span><strong id="relRecebido">R$ 0</strong></div><div class="report-row"><span>Em Aberto</span><strong id="relAberto">R$ 0</strong></div><div class="report-row"><span>Inadimplência</span><strong id="relInadimplencia">0%</strong></div></div>
+                <div class="report-card"><h3>Dia 5</h3><div class="report-row"><span>Clientes</span><strong id="relDia5Cli">0</strong></div><div class="report-row"><span>Recebido</span><strong id="relDia5Rec">R$ 0</strong></div><div class="report-row"><span>Em Aberto</span><strong id="relDia5Ab">R$ 0</strong></div></div>
+                <div class="report-card"><h3>Dia 15</h3><div class="report-row"><span>Clientes</span><strong id="relDia15Cli">0</strong></div><div class="report-row"><span>Recebido</span><strong id="relDia15Rec">R$ 0</strong></div><div class="report-row"><span>Em Aberto</span><strong id="relDia15Ab">R$ 0</strong></div></div>
+                <div class="report-card"><h3>Dia 20</h3><div class="report-row"><span>Clientes</span><strong id="relDia20Cli">0</strong></div><div class="report-row"><span>Recebido</span><strong id="relDia20Rec">R$ 0</strong></div><div class="report-row"><span>Em Aberto</span><strong id="relDia20Ab">R$ 0</strong></div></div>
+                <div class="report-card"><h3>Dia 30</h3><div class="report-row"><span>Clientes</span><strong id="relDia30Cli">0</strong></div><div class="report-row"><span>Recebido</span><strong id="relDia30Rec">R$ 0</strong></div><div class="report-row"><span>Em Aberto</span><strong id="relDia30Ab">R$ 0</strong></div></div>
+            </div>
+            <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:25px;margin-top:20px;" id="relatorioDetalhado"><p style="text-align:center;color:#94a3b8;">Selecione um tipo de relatório</p></div>
+        </div>
+
+        <!-- ADMIN -->
+        <div class="page-content" id="page-admin"><div class="admin-grid"><div class="admin-card highlight"><div class="admin-card-header"><h3>MEU PERFIL</h3></div><div class="admin-card-body"><div class="profile-info"><div class="profile-avatar"><img src="kronos_system.jpg" style="width:100%;height:100%;object-fit:contain;border-radius:50%;" onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\'fas fa-crown\'></i>'"></div><div class="profile-details" id="meuPerfil"></div></div><button class="btn-primary" onclick="editarMeuPerfil()" style="margin-top:15px;width:100%;">EDITAR PERFIL</button></div></div><div class="admin-card"><div class="admin-card-header"><h3>FUNCIONÁRIOS</h3><button class="btn-primary" onclick="abrirModalUsuario()">Novo</button></div><div class="admin-card-body" id="listaUsuarios"></div></div></div></div>
+        
+        <!-- BACKUP -->
+        <div class="page-content" id="page-backup"><div class="backup-container"><div class="backup-card"><h2><i class="fas fa-download"></i> BACKUP</h2><p>Salve todos os dados.</p><button class="btn-primary" onclick="fazerBackup()" style="font-size:1rem;padding:14px 30px;">BAIXAR BACKUP</button></div><div class="backup-card"><h2><i class="fas fa-upload"></i> RESTAURAR</h2><p>Restaure um backup.</p><input type="file" id="arquivoBackup" accept=".json" class="input-full" style="margin-bottom:15px;"><button class="btn-primary" onclick="restaurarBackup()" style="font-size:1rem;padding:14px 30px;background:#ef4444;">RESTAURAR</button></div></div></div>
+    </main>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modalCliente" style="display:none;"><div class="modal-modern"><div class="modal-header"><h2 id="modalTitulo">NOVO CLIENTE</h2><button onclick="fecharModalCliente()"><i class="fas fa-times"></i></button></div><div class="modal-body"><input type="hidden" id="editId"><div class="form-row"><div class="form-group"><label>NOME *</label><input type="text" id="nomeCliente" class="form-input"></div><div class="form-group"><label>MARCA *</label><input type="text" id="marcaCliente" class="form-input"></div></div><div class="form-row"><div class="form-group"><label>VALOR TOTAL *</label><input type="number" id="valorTotal" class="form-input" step="0.01" onkeyup="calcParcela()"></div><div class="form-group"><label>TOTAL PARCELAS *</label><input type="number" id="qtdParcelas" class="form-input" min="1" value="1" onkeyup="calcParcela()"></div></div><div class="form-row"><div class="form-group"><label>DIA VENCIMENTO *</label><select id="diaVencimento" class="form-input"><option value="5">DIA 5</option><option value="15">DIA 15</option><option value="20">DIA 20</option><option value="30">DIA 30</option></select></div><div class="form-group"><label>MÊS REFERÊNCIA *</label><input type="month" id="mesReferencia" class="form-input"></div></div><div class="preview-box">💰 <strong id="previewParcela">R$ 0,00</strong> por parcela | <span id="previewParcelas"></span></div></div><div class="modal-footer"><button class="btn-cancel" onclick="fecharModalCliente()">CANCELAR</button><button class="btn-primary" onclick="salvarCliente()">SALVAR</button></div></div></div>
+
+<div class="modal-overlay" id="modalParcela" style="display:none;"><div class="modal-modern modal-sm"><div class="modal-header"><h2>ATUALIZAR PARCELA</h2><button onclick="fecharModalParcela()"><i class="fas fa-times"></i></button></div><div class="modal-body"><p id="infoParcela"></p><div class="form-group"><label>STATUS</label><select id="novoStatus" class="form-input"><option value="pendente">PENDENTE</option><option value="pagante">PAGANTE</option><option value="pago">PAGO</option><option value="quitado">QUITADO</option><option value="cancelado">CANCELADO</option><option value="inadimplente">INADIMPLENTE</option></select></div><input type="hidden" id="parcelaClienteId"><input type="hidden" id="parcelaKey"></div><div class="modal-footer"><button class="btn-cancel" onclick="fecharModalParcela()">CANCELAR</button><button class="btn-primary" onclick="atualizarStatusParcela()">ATUALIZAR</button></div></div></div>
+
+<div class="modal-overlay" id="modalUsuario" style="display:none;"><div class="modal-modern"><div class="modal-header"><h2 id="modalUsuarioTitulo">NOVO USUÁRIO</h2><button onclick="fecharModalUsuario()"><i class="fas fa-times"></i></button></div><div class="modal-body"><input type="hidden" id="editUserId"><div class="form-row"><div class="form-group"><label>NOME *</label><input type="text" id="usuarioNome" class="form-input"></div><div class="form-group"><label>CARGO</label><input type="text" id="usuarioCargo" class="form-input"></div></div><div class="form-row"><div class="form-group"><label>USUÁRIO *</label><input type="text" id="usuarioLogin" class="form-input"></div><div class="form-group"><label>SENHA *</label><input type="password" id="usuarioSenha" class="form-input"></div></div><div class="form-row"><div class="form-group"><label>NÍVEL</label><select id="usuarioNivel" class="form-input"><option value="admin">ADMIN</option><option value="gerente">GERENTE</option><option value="funcionario">FUNCIONÁRIO</option></select></div><div class="form-group"><label>STATUS</label><select id="usuarioAtivo" class="form-input"><option value="true">ATIVO</option><option value="false">INATIVO</option></select></div></div></div><div class="modal-footer"><button class="btn-cancel" onclick="fecharModalUsuario()">CANCELAR</button><button class="btn-primary" onclick="salvarUsuario()">SALVAR</button></div></div></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
